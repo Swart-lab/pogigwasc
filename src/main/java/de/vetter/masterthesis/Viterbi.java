@@ -103,7 +103,7 @@ public class Viterbi {
 			ViterbiSeed current = startSeed;
 			while(current.getPrevious() != null) {
 				parse.add(new Pair<HMMState, Integer>(model.getState(current.getPrevious().getQ()),
-						current.getL() - current.getPrevious().getL()));
+						current.getPrevious().getL() - current.getL()));
 				current = current.getPrevious();
 			}
 			
