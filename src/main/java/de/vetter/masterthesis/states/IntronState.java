@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.masterthesis.states;
 
 /**
  * Implements a state for introns, which only considers the emmission-length
@@ -8,8 +8,11 @@ package de.vetter.masterthesis;
  */
 public class IntronState extends HMMState {
 
-	public IntronState(String name) {
+	private boolean strand;
+	
+	public IntronState(String name, boolean strand) {
 		super(name);
+		this.strand = strand;
 	}
 
 	@Override

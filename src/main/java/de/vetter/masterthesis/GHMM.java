@@ -3,6 +3,10 @@ package de.vetter.masterthesis;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.vetter.masterthesis.states.HMMState;
+import de.vetter.masterthesis.states.InitialState;
+import de.vetter.masterthesis.states.TerminalState;
+
 /**
  * Implements a generalized Hidden Markov Model, which always has an initial
  * state (index 0) and a terminal state (index 1).

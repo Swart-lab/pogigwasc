@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.masterthesis.states;
 
 public class TerminalState extends HMMState {
 	
