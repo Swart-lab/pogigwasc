@@ -1,5 +1,7 @@
 package de.vetter.masterthesis.states;
 
+import de.vetter.masterthesis.Utilities;
+
 public class StopRegionState extends HMMState {
 	private boolean strand;
 	
@@ -10,10 +12,21 @@ public class StopRegionState extends HMMState {
 
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-		// TODO: instead: have this combine the prestop 21 bases (no UGA) and the stop-UGA, with a total fixed length of 24 nt.
+		if(newEmission.length() != 24)
+			return Double.NEGATIVE_INFINITY;
 		
+		if(!strand) {
+			newEmission = Utilities.reverseComplement(newEmission);
+		}
 		
-		return newEmission == "TGA" ? 0 : Double.NEGATIVE_INFINITY;
+		if(!newEmission.endsWith("TGA"))
+			return Double.NEGATIVE_INFINITY;
+		
+		double result = 0;
+		for(int i = 0; i < 21; i += 3)
+			result += Utilities.getLogCodonProbabilityStopRegion(newEmission.substring(i, i+3));
+		
+		return result;
 	}
 
 }

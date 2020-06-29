@@ -60,6 +60,19 @@ public class GHMM {
 	}
 	
 	/**
+	 * Sets ALL entries to -infty (i.e. probability 0).
+	 * Use carefully!
+	 */
+	public void clearTransitionMatrix() {
+		int n = states.size();
+		for(int from = 0; from < n; from++) {
+			for(int to = 0; to < n; to++) {
+				logTransitions[from][to] = Double.NEGATIVE_INFINITY;
+			}
+		}
+	}
+	
+	/**
 	 * @return whether the transition matrix has been initialised. 
 	 */
 	public boolean isSetTransitionMatrix() {
@@ -79,6 +92,7 @@ public class GHMM {
 				summedExits += Math.exp(logTransitions[from][to]);
 			}
 			if(Math.abs(summedExits - 1) > 1e-9) {
+				System.out.println("Invalid at: " + from + " (sum=" + summedExits + ")");
 				return false;
 			}
 		}

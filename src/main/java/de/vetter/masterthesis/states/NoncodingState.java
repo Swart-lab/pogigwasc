@@ -4,8 +4,8 @@ import de.vetter.masterthesis.Utilities;
 
 public class NoncodingState extends HMMState {
 
-	// TODO: preferably read this from parameter-file
-	private double[] baseFrequencies = new double[] {0.46, 0.10, 0.355, 0.085};
+	// TODO: preferably read this from parameter-file, also make symmetric?
+	private final double[] BASE_FREQUENCIES = new double[] {0.46, 0.10, 0.355, 0.085};
 	
 	public NoncodingState(String name) { super(name); }
 
@@ -14,7 +14,7 @@ public class NoncodingState extends HMMState {
 		if(newEmission.length() > 1) {
 			return Double.NEGATIVE_INFINITY;
 		}
-		return Math.log(baseFrequencies[Utilities.baseToIndex(newEmission.charAt(0))]);
+		return Math.log(BASE_FREQUENCIES[Utilities.baseToIndex(newEmission.charAt(0))]);
 	}
 
 }

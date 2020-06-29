@@ -47,7 +47,8 @@ public class Viterbi {
 		for(int l = 1; l < sequence.length() + 1; l++) {
 			for(int q = 0; q < stateCount; q++) {
 				double max = Double.NEGATIVE_INFINITY;
-				for(int lPrime = 0; lPrime < l; lPrime++) {
+				// Since all states are pretty local, limit the range lPrime can take to 100 into the past
+				for(int lPrime = Math.max(0, l - 100); lPrime < l; lPrime++) {
 					if(lPrime == 0) {
 						max = Math.max(max,
 								viterbiVariables[0][lPrime] + model.getLogTransitionProbability(0, q)
@@ -65,7 +66,11 @@ public class Viterbi {
 				}
 				viterbiVariables[q][l] = max;
 			}
+			if (l % 100 == 0)
+				System.out.println(" done l=" + l + "/" + (sequence.length() + 1));
 		}
+		
+		System.out.println("Computed variables!");
 	}
 	
 	public List<List<Pair<HMMState, Integer>>> computeParses() {
