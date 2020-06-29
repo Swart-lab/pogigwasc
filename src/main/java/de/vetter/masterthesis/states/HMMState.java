@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.masterthesis.states;
 
 /**
  * Abstract class to generalise over different types of states (mainly

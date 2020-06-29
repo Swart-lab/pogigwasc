@@ -4,62 +4,188 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.vetter.masterthesis.states.InitialState;
+import de.vetter.masterthesis.states.IntronState;
+import de.vetter.masterthesis.states.TerminalState;
+
 public class TestGHMM {
 
 	@Test
 	public void testGHMM() {
 		// -> check initial and terminal state!
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		assertEquals(2, ghmm.getNumberOfStates());
+		
+		assertEquals(InitialState.INITIAL_STATE_NAME, ghmm.getState(0).getName());
+		assertTrue(ghmm.getState(0) instanceof InitialState);
+		assertEquals(TerminalState.TERMINAL_STATE_NAME, ghmm.getState(1).getName());
+		assertTrue(ghmm.getState(1) instanceof TerminalState);
 	}
 
 	@Test
 	public void testInitialiseTransitionMatrix() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		ghmm.initialiseTransitionMatrix();
+		
+		assertTrue(ghmm.checkTransitions());
+		
+		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron b", true));
+		ghmm.initialiseTransitionMatrix();
+		
+		assertTrue(ghmm.checkTransitions());
+		assertEquals(0, ghmm.getLogTransitionProbability(0, 2), 1e-9);
+		assertEquals(0, ghmm.getLogTransitionProbability(2, 3), 1e-9);
+		// from last 'proper' state to terminal
+		assertEquals(0, ghmm.getLogTransitionProbability(3, 1), 1e-9);
 	}
 
 	@Test
 	public void testIsSetTransitionMatrix() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		assertFalse(ghmm.isSetTransitionMatrix());
+		
+		ghmm.initialiseTransitionMatrix();
+		assertTrue(ghmm.isSetTransitionMatrix());
+		
+		ghmm.addState(new IntronState("intron b", true));
+		assertFalse(ghmm.isSetTransitionMatrix());
+		
+		ghmm.initialiseTransitionMatrix();
+		assertTrue(ghmm.isSetTransitionMatrix());
 	}
 
 	@Test
 	public void testCheckTransitions() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		ghmm.initialiseTransitionMatrix();
+		assertTrue(ghmm.checkTransitions());
+		
+		ghmm.addState(new IntronState("a", true));
+		ghmm.initialiseTransitionMatrix();
+		
+		assertTrue(ghmm.checkTransitions());
+		
+		ghmm.setTransitionProbability(2, 2, 0.3);
+		assertFalse(ghmm.checkTransitions());
+		
+		ghmm.setTransitionProbability(2, 1, 0.7);
+		assertTrue(ghmm.checkTransitions());
 	}
 
 	@Test
 	public void testSetTransitionProbability() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		ghmm.addState(new IntronState("intron a", true));
+		
+		ghmm.initialiseTransitionMatrix();
+		assertEquals(0, Math.exp(ghmm.getLogTransitionProbability(1, 2)), 1e-9);
+		
+		ghmm.setTransitionProbability(2, 2, 0.6);
+		ghmm.setTransitionProbability(2, 1, 0.4);
+		// Notice the exponential
+		assertEquals(0.6, Math.exp(ghmm.getLogTransitionProbability(2, 2)), 1e-9);
+		assertEquals(0.4, Math.exp(ghmm.getLogTransitionProbability(2, 1)), 1e-9);
+		// this is not to be changed:
+		assertEquals(0, Math.exp(ghmm.getLogTransitionProbability(1, 2)), 1e-9);
+		
+		ghmm.setTransitionProbability(2, 2, 0); // notice: only doing this yields an invalid matrix.
+		assertEquals(0, Math.exp(ghmm.getLogTransitionProbability(2, 2)), 1e-9);
 	}
 
 	@Test
 	public void testNormaliseExitProbabilities() {
-		fail("Not yet implemented");
-	}
+		GHMM ghmm = new GHMM();
+		ghmm.addState(new IntronState("intron a", true));
+		ghmm.initialiseTransitionMatrix();
+		
+		ghmm.setTransitionProbability(2, 2, 7);
+		ghmm.setTransitionProbability(2, 1, 3);
+		
+		assertFalse(ghmm.checkTransitions());
+		ghmm.normaliseExitProbabilities(2);
+		assertTrue(ghmm.checkTransitions());
 
+		assertEquals(0.7, Math.exp(ghmm.getLogTransitionProbability(2, 2)), 1e-9);
+		assertEquals(0.3, Math.exp(ghmm.getLogTransitionProbability(2, 1)), 1e-9);
+	}
+	
 	@Test
-	public void testGetLogTransitionProbability() {
-		fail("Not yet implemented");
+	public void testNormaliseExitProbabilitiesAllZero() {
+		GHMM ghmm = new GHMM();
+		ghmm.addState(new IntronState("intron a", true));
+		ghmm.initialiseTransitionMatrix();
+		
+		ghmm.setTransitionProbability(2, 1, 0); // PROBABILITY!
+
+		assertFalse("Transitions should no longer be valid", ghmm.checkTransitions());
+		ghmm.normaliseExitProbabilities(2);
+		assertTrue("Transitions should be valid again", ghmm.checkTransitions());
+
+		assertEquals("Shoudl have introduced a forwarding-state", 1, Math.exp(ghmm.getLogTransitionProbability(2, 1)), 1e-9);
 	}
 
 	@Test
 	public void testGetLogEmissionProbability() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		IntronState intron = new IntronState("intron a", true);
+		ghmm.addState(intron);
+		ghmm.initialiseTransitionMatrix();
+		
+		assertEquals(intron.computeLogEmissionProbability(0, "GGGGG", "ATACCTTAAAAC"),
+				ghmm.getLogEmissionProbability(0, 2, "GGGGG", "ATACCTTAAAAC"), 1e-9);
 	}
 
 	@Test
 	public void testAddState() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		
+		assertEquals(2, ghmm.getNumberOfStates());
+		
+		ghmm.addState(new IntronState("intron a", true));
+		assertEquals(3, ghmm.getNumberOfStates());
+		assertTrue(ghmm.getState(2) instanceof IntronState);
+		
+		assertTrue(ghmm.getState(0) instanceof InitialState);
+		assertTrue(ghmm.getState(1) instanceof TerminalState);
 	}
 
 	@Test
 	public void testGetState() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		assertTrue(ghmm.getState(0) instanceof InitialState);
+		assertTrue(ghmm.getState(1) instanceof TerminalState);
+		ghmm.addState(new IntronState("intron a", true));
+		assertTrue(ghmm.getState(2) instanceof IntronState);
+		assertEquals("intron a", ghmm.getState(2).getName());
 	}
 
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void testRemoveStateCannotRemoveInitial() {
+		GHMM ghmm = new GHMM();
+		ghmm.removeState(0);
+	}
+	
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void testRemoveStateCannotRemoveTerminal() {
+		GHMM ghmm = new GHMM();
+		ghmm.removeState(1);
+	}
+	
 	@Test
 	public void testRemoveState() {
-		fail("Not yet implemented");
+		GHMM ghmm = new GHMM();
+		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron b", true));
+		assertEquals("intron a", ghmm.getState(2).getName());
+		
+		ghmm.initialiseTransitionMatrix();
+		assertTrue(ghmm.isSetTransitionMatrix());
+		
+		assertEquals("intron a", ghmm.removeState(2).getName());
+		assertFalse(ghmm.isSetTransitionMatrix());
+		
+		assertEquals("intron b", ghmm.getState(2).getName());
 	}
 
 }
