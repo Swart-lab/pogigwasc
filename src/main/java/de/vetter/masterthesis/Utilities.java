@@ -13,10 +13,9 @@ public class Utilities {
 			88.5808275421977, 92.13617560368711, 95.71969454214322, 99.33061245478744, 102.96819861451382,
 			106.63176026064347 };
 	
-	// maybe rather store log factorial? yes: 21! is no longer within integer.
 	
 	private static final double[][] BASE_PROBABILITIES_CDS = new double[][] {
-			{ 0.24, 0.13, 0.33, 0.3 }, 
+			{ 0.24, 0.13, 0.31, 0.32 }, 
 			{ 0.30, 0.18, 0.37, 0.15 },
 			{ 0.36, 0.12, 0.38, 0.14 } };
 
@@ -118,6 +117,28 @@ public class Utilities {
 	 */
 	public static void main(String[] no) {
 		System.out.println("p(UGA)="+CODON_PROBABILITIES_STOPREGION[codonToIndex("TGA")]);
+		
+		double expectedGCinCDS = 0;
+		double[] sumValueProbabilities = new double[4];
+		double[][] probabilityGC = new double[][] {
+			{BASE_PROBABILITIES_CDS[0][0] + BASE_PROBABILITIES_CDS[0][2], BASE_PROBABILITIES_CDS[0][1] + BASE_PROBABILITIES_CDS[0][3]},
+			{BASE_PROBABILITIES_CDS[1][0] + BASE_PROBABILITIES_CDS[1][2], BASE_PROBABILITIES_CDS[1][1] + BASE_PROBABILITIES_CDS[1][3]},
+			{BASE_PROBABILITIES_CDS[2][0] + BASE_PROBABILITIES_CDS[2][2], BASE_PROBABILITIES_CDS[2][1] + BASE_PROBABILITIES_CDS[2][3]}
+		};
+		for(int base1 = 0; base1 < 2; base1++) {
+			for(int base2 = 0; base2 < 2; base2++) {
+				for(int base3 = 0; base3 < 2; base3++) {
+					//expectedGCinCDS += (base1 + base2 + base3) * probabilityGC[0][base1] * probabilityGC[1][base2] * probabilityGC[2][base3];
+					sumValueProbabilities[(base1 + base2 + base3)] += probabilityGC[0][base1] * probabilityGC[1][base2] * probabilityGC[2][base3];
+				}
+			}
+		}
+		for(int s = 0; s < 4; s++) 
+			expectedGCinCDS += s*sumValueProbabilities[s];
+		expectedGCinCDS /= 3; // there are three bases
+		
+		System.out.println("Expected GC% " + expectedGCinCDS);
+		
 		
 		double sum = 0;
 		for(int i = 0; i < 64; i++) {

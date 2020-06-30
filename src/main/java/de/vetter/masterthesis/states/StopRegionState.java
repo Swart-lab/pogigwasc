@@ -1,5 +1,7 @@
 package de.vetter.masterthesis.states;
 
+import java.util.Iterator;
+
 import de.vetter.masterthesis.Utilities;
 
 public class StopRegionState extends HMMState {
@@ -27,6 +29,35 @@ public class StopRegionState extends HMMState {
 			result += Utilities.getLogCodonProbabilityStopRegion(newEmission.substring(i, i+3));
 		
 		return result;
+	}
+	
+	/**
+	 * StopRegion allows only steps of size 24 -> thus, iterate only once
+	 */
+	@Override
+	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+		return new Iterable<Integer>() {
+
+			@Override
+			public Iterator<Integer> iterator() {
+				return new Iterator<Integer>() {
+					private int currentLPrime = Math.max(0, l - 24);
+					
+					@Override
+					public boolean hasNext() {
+						return currentLPrime < l;
+					}
+
+					@Override
+					public Integer next() {
+						int result = currentLPrime;
+						currentLPrime = l;
+						return result;
+					}
+				};
+			}
+			
+		};
 	}
 
 }

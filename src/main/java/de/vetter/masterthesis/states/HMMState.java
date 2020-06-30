@@ -1,5 +1,7 @@
 package de.vetter.masterthesis.states;
 
+import java.util.Iterator;
+
 /**
  * Abstract class to generalise over different types of states (mainly
  * differentiated by their emmission distributions)
@@ -23,6 +25,34 @@ public abstract class HMMState {
 		this.name = name;
 	}
 	
+	/**
+	 * Override this in inheriting states to limit the iteration to only sensible lPrimes.
+	 * 
+	 * @param l from viterbi-recursion: this is the upper limit (exclusive) of the values that are to be iterated.
+	 * @return an iterator iterating from 0 to l-1 (inclusive), in the basic form
+	 */
+	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+		return new Iterable<Integer>() {
+
+			@Override
+			public Iterator<Integer> iterator() {
+				return new Iterator<Integer>() {
+					private int currentLPrime = 0;
+					
+					@Override
+					public boolean hasNext() {
+						return currentLPrime < l;
+					}
+
+					@Override
+					public Integer next() {
+						return currentLPrime++;
+					}
+				};
+			}
+			
+		};
+	}
 	
 	/**
 	 * Computes the log_2 of the probability of emitting the newEmission when in

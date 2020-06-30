@@ -214,7 +214,10 @@ public class GHMM {
 	public String toString() {
 		StringBuffer result = new StringBuffer();
 		result.append("GHMM\n");
-		result.append("states: " + states + "\n");
+		result.append(states.size() + " states:\n");
+		for(int q = 0; q < states.size(); q++) {
+			result.append("\t" + q + ": " + getState(q).getName() + "\n");
+		}
 		result.append("Transition-probabilities are" + (isSetTransitionMatrix() ? " " : "not ") + "set");
 		if(isSetTransitionMatrix()) {
 			result.append(", and " + (checkTransitions() ? "valid" : "invalid"));

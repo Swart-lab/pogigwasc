@@ -35,8 +35,6 @@ public class Viterbi {
 		// NOTE! Compute in logarithm, i.e. probability 1 is entry 0 etc; Addition instead of multiplication
 		viterbiVariables = new double[stateCount][sequence.length() + 1];
 		
-		// TODO: do i need the terminal state in this matrix?
-		
 		// Initialisation:
 		viterbiVariables[0][0] = 0; 
 		for(int state = 1; state < stateCount; state++) {
@@ -47,7 +45,27 @@ public class Viterbi {
 		for(int l = 1; l < sequence.length() + 1; l++) {
 			for(int q = 0; q < stateCount; q++) {
 				double max = Double.NEGATIVE_INFINITY;
-				// Since all states are pretty local, limit the range lPrime can take to 100 into the past
+				for (int qPrime = 0; qPrime < stateCount; qPrime++) {
+					if(model.getLogTransitionProbability(qPrime, q) > Double.NEGATIVE_INFINITY && qPrime != 1) {
+						if(qPrime == 0) {
+							max = Math.max(max,
+									viterbiVariables[qPrime][0] + model.getLogTransitionProbability(qPrime, q)
+											+ model.getLogEmissionProbability(0, q, sequence.substring(qPrime, 0),
+													sequence.substring(0, l)));
+						} else {
+							// q' \in Q, i.e. neither initial nor terminal state (cannot come from the terminal state)
+							// for(int lPrime = Math.max(0, l - 100); lPrime < l; lPrime++) {
+							for(int lPrime : model.getState(q).iteratePermissibleLengths(l)) {
+								max = Math.max(max,
+										viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
+												+ model.getLogEmissionProbability(qPrime, q, sequence.substring(0, lPrime),
+														sequence.substring(lPrime, l)));
+							}
+						}
+					}
+				}
+				
+				/* Since all states are pretty local, limit the range lPrime can take to 100 into the past
 				for(int lPrime = Math.max(0, l - 100); lPrime < l; lPrime++) {
 					if(lPrime == 0) {
 						max = Math.max(max,
@@ -63,7 +81,7 @@ public class Viterbi {
 													sequence.substring(lPrime, l)));
 						}
 					}
-				}
+				}*/
 				viterbiVariables[q][l] = max;
 			}
 			if (l % 100 == 0)

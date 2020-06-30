@@ -15,4 +15,6 @@ public class InitialState extends HMMState {
 		return newEmission.length() == 0 ? 0 : Double.NEGATIVE_INFINITY;
 	}
 
+	
+	
 }

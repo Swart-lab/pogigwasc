@@ -17,6 +17,29 @@ import de.vetter.masterthesis.states.*;
  */
 public class App 
 {
+	private static final String NCS = "NCS";
+	private static final String FORWARD_START = "+M";
+	private static final String FORWARD_CDS = "+CDS";
+	private static final String FORWARD_STOP = "+Stop";
+	private static final String FORWARD_INTRON_0_0 = "+intron 0-0";
+	private static final String FORWARD_INTRON_1_2 = "+intron 1-2";
+	private static final String FORWARD_INTRON_2_1 = "+intron 2-1";
+	private static final String FORWARD_PREINTRON_ONE = "+1 nt before intron";
+	private static final String FORWARD_PREINTRON_TWO = "+2 nts before intron";
+	private static final String FORWARD_POSTINTRON_ONE = "+1 nt after intron";
+	private static final String FORWARD_POSTINTRON_TWO = "+2 nts after intron";
+	
+	private static final String REVERSE_START = "-M";
+	private static final String REVERSE_CDS = "-CDS";
+	private static final String REVERSE_STOP = "-Stop";
+	private static final String REVERSE_INTRON_0_0 = "-intron 0-0";
+	private static final String REVERSE_INTRON_1_2 = "-intron 1-2";
+	private static final String REVERSE_INTRON_2_1 = "-intron 2-1";
+	private static final String REVERSE_PREINTRON_ONE = "-1 nt before intron";
+	private static final String REVERSE_PREINTRON_TWO = "-2 nts before intron";
+	private static final String REVERSE_POSTINTRON_ONE = "-1 nt after intron";
+	private static final String REVERSE_POSTINTRON_TWO = "-2 nts after intron";
+	
     public static void main( String[] args ) throws IOException
     {
     	if(args.length != 2) {
@@ -34,18 +57,18 @@ public class App
         // TODO: preprocess: replace N? Definitely toUpperCase
         
         GHMM ghmm = new GHMM();
-        ghmm.addState(new NoncodingState("NCS"));
+        ghmm.addState(new NoncodingState(NCS));
         
         /** FORWARD STRAND */
-        ghmm.addState(new FixedSequenceState("+M", "ATG")); // Name states + for forward, and - for backward strand
-        ghmm.addState(new CodingState("+CDS", true));
-        ghmm.addState(new StopRegionState("+Stop", true));
+        ghmm.addState(new FixedSequenceState(FORWARD_START, "ATG")); // Name states + for forward, and - for backward strand
+        ghmm.addState(new CodingState(FORWARD_CDS, true));
+        ghmm.addState(new StopRegionState(FORWARD_STOP, true));
         
         /** simplest intron */
-        ghmm.addState(new IntronState("+intron 0-0", true));
+        ghmm.addState(new IntronState(FORWARD_INTRON_0_0, true));
         
         /** intron preceded by one nt and followed by two nt of a codon */
-        ghmm.addState(new HMMState("+1 nt before intron") {
+        ghmm.addState(new HMMState(FORWARD_PREINTRON_ONE) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the first base of a codon -> use empirical 1st-position probability
@@ -55,8 +78,8 @@ public class App
 				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 0);
 			}
         });
-        ghmm.addState(new IntronState("+intron 1-2", true));
-        ghmm.addState(new HMMState("+2 nts after intron") {
+        ghmm.addState(new IntronState(FORWARD_INTRON_1_2, true));
+        ghmm.addState(new HMMState(FORWARD_POSTINTRON_TWO) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the second and third of a codon -> use respective empirical distrs
@@ -69,7 +92,7 @@ public class App
         });
         
         /** intron preceded by two nt and followed by one nt of a codon */
-        ghmm.addState(new HMMState("+2 nts before intron") {
+        ghmm.addState(new HMMState(FORWARD_PREINTRON_TWO) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the first and second of a codon -> use respective empirical distrs
@@ -80,8 +103,8 @@ public class App
 						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
 			}
         });
-        ghmm.addState(new IntronState("+intron 2-1", true));
-        ghmm.addState(new HMMState("+1 nt after intron") {
+        ghmm.addState(new IntronState(FORWARD_INTRON_2_1, true));
+        ghmm.addState(new HMMState(FORWARD_POSTINTRON_ONE) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the final base of a codon -> use empirical 3rd-position probability
@@ -94,15 +117,15 @@ public class App
         
         
         /** REVERSE STRAND */
-        ghmm.addState(new FixedSequenceState("-M", "CAT")); // Name states + for forward, and - for backward strand
-        ghmm.addState(new CodingState("-CDS", false));
-        ghmm.addState(new StopRegionState("-Stop", false));
+        ghmm.addState(new FixedSequenceState(REVERSE_START, "CAT")); // Name states + for forward, and - for backward strand
+        ghmm.addState(new CodingState(REVERSE_CDS, false));
+        ghmm.addState(new StopRegionState(REVERSE_STOP, false));
         
         /** simplest intron */
-        ghmm.addState(new IntronState("-intron 0-0", false));
+        ghmm.addState(new IntronState(REVERSE_INTRON_0_0, false));
         
         /** intron preceded by one nt and followed by two nt of a codon */
-        ghmm.addState(new HMMState("-1 nt before intron") {
+        ghmm.addState(new HMMState(REVERSE_PREINTRON_ONE) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the last base of a codon
@@ -112,8 +135,8 @@ public class App
 				return Utilities.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 2);
 			}
         });
-        ghmm.addState(new IntronState("-intron 1-2", false));
-        ghmm.addState(new HMMState("-2 nts after intron") {
+        ghmm.addState(new IntronState(REVERSE_INTRON_1_2, false));
+        ghmm.addState(new HMMState(REVERSE_POSTINTRON_TWO) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the first and second of a codon
@@ -127,7 +150,7 @@ public class App
         });
         
         /** intron preceded by two nt and followed by one nt of a codon */
-        ghmm.addState(new HMMState("-2 nts before intron") {
+        ghmm.addState(new HMMState(REVERSE_PREINTRON_TWO) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the third and second of a codon
@@ -139,8 +162,8 @@ public class App
 						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
 			}
         });
-        ghmm.addState(new IntronState("-intron 2-1", true));
-        ghmm.addState(new HMMState("-1 nt after intron") {
+        ghmm.addState(new IntronState(REVERSE_INTRON_2_1, true));
+        ghmm.addState(new HMMState(REVERSE_POSTINTRON_ONE) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the first base of a codon
@@ -161,18 +184,22 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        ghmm.setTransitionProbability(2, 2, 397d / 400d);
-        ghmm.setTransitionProbability(2, 3, 1d / 400d); // NCS -> +M
-        ghmm.setTransitionProbability(2, 15, 1d / 400d); // NCS -> -Stop
-        ghmm.setTransitionProbability(2, 1, 1d / 400d); // NCS -> terminal
+        ghmm.setTransitionProbability(2, 2, 1497d/1500d);
+        ghmm.setTransitionProbability(2, 3, 1d/1500d); // NCS -> +M
+        ghmm.setTransitionProbability(2, 15, 1d/1500d); // NCS -> -Stop
+        ghmm.setTransitionProbability(2, 1, 1d/1500d); // NCS -> terminal
         
         ghmm.setTransitionProbability(3, 4, 1d); // +M -> +CDS
         
-        ghmm.setTransitionProbability(4, 4, 1d - (1d/1200d)); // stay in +CDS (exonlength median=960, mean=1250 -> approx 1200)
-        ghmm.setTransitionProbability(4, 5, (1d/1200d) * 0.61d); // +CDS -> +Stop: from introns / gene: geometric with 0 -> empirical p ~ 61%
-        ghmm.setTransitionProbability(4, 6, (1d/1200d) * 0.13d); // +CDS -> +intron 0-0
-        ghmm.setTransitionProbability(4, 7, (1d/1200d) * 0.13d); // +CDS -> + 1 nt before
-        ghmm.setTransitionProbability(4, 10, (1d/1200d) * 0.13d); // +CDS -> + 2 nts before
+        double probabilityStayCDS     = 0.999999999999;
+        double probabilityCDSToIntron = 0.000000000000001;
+        double probabilityCDSEnd      = 0.000000000000997;
+        
+        ghmm.setTransitionProbability(4, 4, probabilityStayCDS); // stay in +CDS (exonlength median=960, mean=1250 -> approx 1200)
+        ghmm.setTransitionProbability(4, 5, probabilityCDSEnd); // +CDS -> +Stop: from introns / gene: geometric with 0 -> empirical p ~ 61%
+        ghmm.setTransitionProbability(4, 6, probabilityCDSToIntron); // +CDS -> +intron 0-0
+        ghmm.setTransitionProbability(4, 7, probabilityCDSToIntron); // +CDS -> + 1 nt before
+        ghmm.setTransitionProbability(4,10, probabilityCDSToIntron); // +CDS -> + 2 nts before
         
         ghmm.setTransitionProbability(5, 2, 1d); // +stop -> NCS always
         ghmm.setTransitionProbability(6, 4, 1d); // + intron 0-0 -> +CDS always
@@ -188,11 +215,11 @@ public class App
         // Reverse model:
         ghmm.setTransitionProbability(15, 14, 1d); // -Stop -> -CDS
         
-        ghmm.setTransitionProbability(14, 14, 1d - (1d/1200d)); // stay in -CDS (see above)
-        ghmm.setTransitionProbability(14, 13, (1d/1200d) * 0.61d); // -CDS -> -M: from introns / gene: geometric with 0 -> empirical p ~ 61%
-        ghmm.setTransitionProbability(14, 16, (1d/1200d) * 0.13d); // -CDS -> -intron 0-0
-        ghmm.setTransitionProbability(14, 17, (1d/1200d) * 0.13d); // -CDS -> - 1 nt before (= to the left of) intron
-        ghmm.setTransitionProbability(14, 20, (1d/1200d) * 0.13d); // -CDS -> - 2 nts before (= to the left of) intron
+        ghmm.setTransitionProbability(14, 14, probabilityStayCDS); // stay in -CDS (see above)
+        ghmm.setTransitionProbability(14, 13, probabilityCDSEnd); // -CDS -> -M: from introns / gene: geometric with 0 -> empirical p ~ 61%
+        ghmm.setTransitionProbability(14, 16, probabilityCDSToIntron); // -CDS -> -intron 0-0
+        ghmm.setTransitionProbability(14, 17, probabilityCDSToIntron); // -CDS -> - 1 nt before (= to the left of) intron
+        ghmm.setTransitionProbability(14, 20, probabilityCDSToIntron); // -CDS -> - 2 nts before (= to the left of) intron
         
         ghmm.setTransitionProbability(13, 2, 1d); // -M -> NCS always
         
@@ -228,32 +255,100 @@ public class App
 		
 		// on last sequence
 		if (currentHeader != null) {
-			doPredictions(ghmm, writer, currentHeader, currentSequence.substring(9000, 12000));
+			doPredictions(ghmm, writer, currentHeader, currentSequence.substring(45700, 48500));
 		}
     }
     
+    /**
+     * Performs gene prediction on the given sequence and writes the result as gff into the writer.
+     * @param ghmm
+     * @param writer
+     * @param currentHeader
+     * @param currentSequence
+     */
     public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence) {
     	System.out.println("\nParses for " + currentHeader + ":\n");
 		Viterbi viterbi = new Viterbi(ghmm, currentSequence);
 		for(List<Pair<HMMState, Integer>> parse : viterbi.computeParses()) {
 			System.out.print("\nParse:");
-			int currentPos = 1;
-			boolean openCDS = false;
+			int currentPos = 45701;
+			int ncsCount = 0;
+			
+			GFFFeature currentFeature = null;
+			int startOfCurrentFeature = -1;
+			
 			for(Pair<HMMState, Integer> s : parse) {
-				currentPos += s.getSecond(); 
-				if(s.getFirst().getName() == "NCS") {
-					continue;
-				} else if(s.getFirst() instanceof CodingState) {
-					if(!openCDS)
-						System.out.println("  " + s.getFirst().getName() + " [" + (currentPos - s.getSecond()) + ", ");
-					openCDS = true;
-				} else {
-					if(openCDS)
-						System.out.println(currentPos-1 + "]");
-					openCDS = false;
-					System.out.print("  " + s.getFirst().getName() + " [" + (currentPos - s.getSecond() + 1) + ", " + currentPos + "]");
+				HMMState state = s.getFirst();
+				switch(state.getName()) {
+				case NCS:
+					startOfCurrentFeature = currentPos + 1; // for reverse-stop
+					currentFeature = null;
+					break;
+				case FORWARD_START:
+				case FORWARD_POSTINTRON_ONE:
+				case FORWARD_POSTINTRON_TWO:
+				case FORWARD_CDS:
+				case FORWARD_PREINTRON_ONE:
+				case FORWARD_PREINTRON_TWO:
+					
+				case REVERSE_POSTINTRON_ONE:
+				case REVERSE_POSTINTRON_TWO:
+				case REVERSE_CDS:
+				case REVERSE_PREINTRON_ONE:
+				case REVERSE_PREINTRON_TWO:
+					if(currentFeature != null && currentFeature != GFFFeature.CDS) {
+						System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+								+ startOfCurrentFeature + "\t" + (currentPos - 1) + "\t.\t"
+								+ (state.getName().startsWith("+") ? "+" : "-") + "\t.\t ");
+					}
+					
+					if(currentFeature != GFFFeature.CDS)
+						startOfCurrentFeature = currentPos;
+					currentFeature = GFFFeature.CDS;
+					
+					break;
+				case FORWARD_INTRON_0_0:
+				case FORWARD_INTRON_1_2:
+				case FORWARD_INTRON_2_1:
+				case REVERSE_INTRON_0_0:
+				case REVERSE_INTRON_1_2:
+				case REVERSE_INTRON_2_1:
+					// some kind of CDS must precede
+					System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+							+ startOfCurrentFeature + "\t" + (currentPos - 1) + "\t.\t"
+							+ (state.getName().startsWith("+") ? "+" : "-") + "\t.\t ");
+					currentFeature = GFFFeature.INTRON;
+					startOfCurrentFeature = currentPos;
+					break;
+					
+				case FORWARD_STOP:
+					// CDS must precede
+					System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+							+ startOfCurrentFeature + "\t" + (currentPos + 20) + "\t.\t+\t.\t ");
+					// The actual stop
+					System.out.println(currentHeader + "\tpredicted\tstop_codon\t" + (currentPos + 21) + "\t"
+							+ (currentPos + 23) + "\t.\t+\t.\t ");
+					currentFeature = null; // NCS follows
+					startOfCurrentFeature = currentPos + 24; // not strictly necessary, following NCS will take care of this.
+					break;
+				case REVERSE_START:
+					// Komme von CDS! -M zählt mit in die CDS.
+					System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+							+ startOfCurrentFeature + "\t" + (currentPos + 2) + "\t.\t-\t.\t ");
+					currentFeature = null; // NCS follows
+					startOfCurrentFeature = currentPos + 3; // that's where the NCS starts
+					break;
+				case REVERSE_STOP:
+					System.out.println(currentHeader + "\tpredicted\tstop_codon\t" + currentPos + "\t"
+							+ (currentPos + 2) + "\t.\t-\t.\t ");
+					currentFeature = GFFFeature.CDS;
+					startOfCurrentFeature = currentPos + 3;
+					break;
 				}
+				
+				currentPos += s.getSecond();
 			}
+			System.out.println("\n" + ncsCount + "/" + currentSequence.length());
 		}
     }
 }
