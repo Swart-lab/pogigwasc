@@ -47,10 +47,11 @@ public class Viterbi {
 				double max = Double.NEGATIVE_INFINITY;
 				for (int qPrime = 0; qPrime < stateCount; qPrime++) {
 					if(model.getLogTransitionProbability(qPrime, q) > Double.NEGATIVE_INFINITY && qPrime != 1) {
-						if(qPrime == 0) {
+						if(qPrime == 0 && l < 10) {
+							// this causes slowdown: for large L, no point in doing this;
 							max = Math.max(max,
 									viterbiVariables[qPrime][0] + model.getLogTransitionProbability(qPrime, q)
-											+ model.getLogEmissionProbability(0, q, sequence.substring(qPrime, 0),
+											+ model.getLogEmissionProbability(0, q, sequence.substring(0, 0),
 													sequence.substring(0, l)));
 						} else {
 							// q' \in Q, i.e. neither initial nor terminal state (cannot come from the terminal state)
@@ -64,24 +65,7 @@ public class Viterbi {
 						}
 					}
 				}
-				
-				/* Since all states are pretty local, limit the range lPrime can take to 100 into the past
-				for(int lPrime = Math.max(0, l - 100); lPrime < l; lPrime++) {
-					if(lPrime == 0) {
-						max = Math.max(max,
-								viterbiVariables[0][lPrime] + model.getLogTransitionProbability(0, q)
-										+ model.getLogEmissionProbability(0, q, sequence.substring(0, lPrime),
-												sequence.substring(lPrime, l)));
-					} else {
-						// q' \in Q, i.e. neither initial nor terminal state (cannot come from the terminal state)
-						for (int qPrime = 2; qPrime < stateCount; qPrime++) {
-							max = Math.max(max,
-									viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
-											+ model.getLogEmissionProbability(qPrime, q, sequence.substring(0, lPrime),
-													sequence.substring(lPrime, l)));
-						}
-					}
-				}*/
+
 				viterbiVariables[q][l] = max;
 			}
 			if (l % 100 == 0)

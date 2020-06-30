@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 
 import de.vetter.masterthesis.states.*;
 
@@ -246,7 +247,7 @@ public class App
 				if (currentHeader != null) {
 					doPredictions(ghmm, writer, currentHeader, currentSequence);
 				}
-				currentHeader = line;
+				currentHeader = line.substring(1);
 				currentSequence = "";
 			} else {
 				currentSequence += line;
@@ -255,8 +256,12 @@ public class App
 		
 		// on last sequence
 		if (currentHeader != null) {
-			doPredictions(ghmm, writer, currentHeader, currentSequence.substring(45700, 48500));
+			doPredictions(ghmm, writer, currentHeader, currentSequence); // .substring(45700, 48500));
 		}
+		
+		reader.close();
+		writer.flush();
+		writer.close();
     }
     
     /**
@@ -265,21 +270,21 @@ public class App
      * @param writer
      * @param currentHeader
      * @param currentSequence
+     * @throws IOException 
      */
-    public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence) {
+    public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence) throws IOException {
     	System.out.println("\nParses for " + currentHeader + ":\n");
 		Viterbi viterbi = new Viterbi(ghmm, currentSequence);
 		for(List<Pair<HMMState, Integer>> parse : viterbi.computeParses()) {
-			System.out.print("\nParse:");
+			System.out.println("\n\tWriting parse to file");
 			int currentPos = 45701;
-			int ncsCount = 0;
 			
 			GFFFeature currentFeature = null;
 			int startOfCurrentFeature = -1;
 			
 			for(Pair<HMMState, Integer> s : parse) {
 				HMMState state = s.getFirst();
-				switch(state.getName()) {
+				switch (state.getName()) {
 				case NCS:
 					startOfCurrentFeature = currentPos + 1; // for reverse-stop
 					currentFeature = null;
@@ -290,22 +295,24 @@ public class App
 				case FORWARD_CDS:
 				case FORWARD_PREINTRON_ONE:
 				case FORWARD_PREINTRON_TWO:
-					
+
 				case REVERSE_POSTINTRON_ONE:
 				case REVERSE_POSTINTRON_TWO:
 				case REVERSE_CDS:
 				case REVERSE_PREINTRON_ONE:
 				case REVERSE_PREINTRON_TWO:
-					if(currentFeature != null && currentFeature != GFFFeature.CDS) {
-						System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+					if (currentFeature != null && currentFeature != GFFFeature.CDS) {
+						writer.write(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
 								+ startOfCurrentFeature + "\t" + (currentPos - 1) + "\t.\t"
 								+ (state.getName().startsWith("+") ? "+" : "-") + "\t.\t ");
+						writer.newLine();
+						
 					}
-					
-					if(currentFeature != GFFFeature.CDS)
+
+					if (currentFeature != GFFFeature.CDS)
 						startOfCurrentFeature = currentPos;
 					currentFeature = GFFFeature.CDS;
-					
+
 					break;
 				case FORWARD_INTRON_0_0:
 				case FORWARD_INTRON_1_2:
@@ -314,33 +321,39 @@ public class App
 				case REVERSE_INTRON_1_2:
 				case REVERSE_INTRON_2_1:
 					// some kind of CDS must precede
-					System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+					writer.write(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
 							+ startOfCurrentFeature + "\t" + (currentPos - 1) + "\t.\t"
 							+ (state.getName().startsWith("+") ? "+" : "-") + "\t.\t ");
+					writer.newLine();
 					currentFeature = GFFFeature.INTRON;
 					startOfCurrentFeature = currentPos;
 					break;
-					
+
 				case FORWARD_STOP:
 					// CDS must precede
-					System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+					writer.write(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
 							+ startOfCurrentFeature + "\t" + (currentPos + 20) + "\t.\t+\t.\t ");
+					writer.newLine();
 					// The actual stop
-					System.out.println(currentHeader + "\tpredicted\tstop_codon\t" + (currentPos + 21) + "\t"
+					writer.write(currentHeader + "\tpredicted\tstop_codon\t" + (currentPos + 21) + "\t"
 							+ (currentPos + 23) + "\t.\t+\t.\t ");
+					writer.newLine();
 					currentFeature = null; // NCS follows
-					startOfCurrentFeature = currentPos + 24; // not strictly necessary, following NCS will take care of this.
+					startOfCurrentFeature = currentPos + 24; // not strictly necessary, following NCS will take care of
+																// this.
 					break;
 				case REVERSE_START:
 					// Komme von CDS! -M zählt mit in die CDS.
-					System.out.println(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
+					writer.write(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
 							+ startOfCurrentFeature + "\t" + (currentPos + 2) + "\t.\t-\t.\t ");
+					writer.newLine();
 					currentFeature = null; // NCS follows
 					startOfCurrentFeature = currentPos + 3; // that's where the NCS starts
 					break;
 				case REVERSE_STOP:
-					System.out.println(currentHeader + "\tpredicted\tstop_codon\t" + currentPos + "\t"
-							+ (currentPos + 2) + "\t.\t-\t.\t ");
+					writer.write(currentHeader + "\tpredicted\tstop_codon\t" + currentPos + "\t" + (currentPos + 2)
+							+ "\t.\t-\t.\t ");
+					writer.newLine();
 					currentFeature = GFFFeature.CDS;
 					startOfCurrentFeature = currentPos + 3;
 					break;
@@ -348,7 +361,8 @@ public class App
 				
 				currentPos += s.getSecond();
 			}
-			System.out.println("\n" + ncsCount + "/" + currentSequence.length());
 		}
+		
+		System.out.println("done");
     }
 }

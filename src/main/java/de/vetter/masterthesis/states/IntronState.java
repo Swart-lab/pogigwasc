@@ -65,7 +65,7 @@ public class IntronState extends HMMState {
 			@Override
 			public Iterator<Integer> iterator() {
 				return new Iterator<Integer>() {
-					private int currentLPrime = Math.max(0, l - 53);
+					private int currentLPrime = Math.max(0, l - 33);
 					
 					@Override
 					public boolean hasNext() {
