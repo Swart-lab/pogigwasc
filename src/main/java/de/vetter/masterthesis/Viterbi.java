@@ -111,9 +111,10 @@ public class Viterbi {
 		}
 		
 		while(!workLoad.isEmpty()) {
-			System.out.println("Workload : " + workLoad.size());
 			ViterbiSeed current = workLoad.remove(0);
 			List<ViterbiSeed> stepped = current.step(viterbiVariables);
+			if(stepped.size() > 1)
+				System.out.println("Encountered ambiguous parse: |Workload|=" + workLoad.size());
 			for(ViterbiSeed s : stepped) {
 				if(s.isFinished()) {
 					finished.add(s);
