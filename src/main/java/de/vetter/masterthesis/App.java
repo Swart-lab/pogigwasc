@@ -69,7 +69,7 @@ public class App
         ghmm.addState(new IntronState(FORWARD_INTRON_0_0, true));
         
         /** intron preceded by one nt and followed by two nt of a codon */
-        ghmm.addState(new HMMState(FORWARD_PREINTRON_ONE) {
+        ghmm.addState(new ConstantLengthState(FORWARD_PREINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the first base of a codon -> use empirical 1st-position probability
@@ -80,7 +80,7 @@ public class App
 			}
         });
         ghmm.addState(new IntronState(FORWARD_INTRON_1_2, true));
-        ghmm.addState(new HMMState(FORWARD_POSTINTRON_TWO) {
+        ghmm.addState(new ConstantLengthState(FORWARD_POSTINTRON_TWO, 2) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the second and third of a codon -> use respective empirical distrs
@@ -93,7 +93,7 @@ public class App
         });
         
         /** intron preceded by two nt and followed by one nt of a codon */
-        ghmm.addState(new HMMState(FORWARD_PREINTRON_TWO) {
+        ghmm.addState(new ConstantLengthState(FORWARD_PREINTRON_TWO, 2) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the first and second of a codon -> use respective empirical distrs
@@ -105,7 +105,7 @@ public class App
 			}
         });
         ghmm.addState(new IntronState(FORWARD_INTRON_2_1, true));
-        ghmm.addState(new HMMState(FORWARD_POSTINTRON_ONE) {
+        ghmm.addState(new ConstantLengthState(FORWARD_POSTINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the final base of a codon -> use empirical 3rd-position probability
@@ -126,7 +126,7 @@ public class App
         ghmm.addState(new IntronState(REVERSE_INTRON_0_0, false));
         
         /** intron preceded by one nt and followed by two nt of a codon */
-        ghmm.addState(new HMMState(REVERSE_PREINTRON_ONE) {
+        ghmm.addState(new ConstantLengthState(REVERSE_PREINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the last base of a codon
@@ -137,7 +137,7 @@ public class App
 			}
         });
         ghmm.addState(new IntronState(REVERSE_INTRON_1_2, false));
-        ghmm.addState(new HMMState(REVERSE_POSTINTRON_TWO) {
+        ghmm.addState(new ConstantLengthState(REVERSE_POSTINTRON_TWO, 2) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the first and second of a codon
@@ -151,7 +151,7 @@ public class App
         });
         
         /** intron preceded by two nt and followed by one nt of a codon */
-        ghmm.addState(new HMMState(REVERSE_PREINTRON_TWO) {
+        ghmm.addState(new ConstantLengthState(REVERSE_PREINTRON_TWO, 2) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// These are the third and second of a codon
@@ -164,7 +164,7 @@ public class App
 			}
         });
         ghmm.addState(new IntronState(REVERSE_INTRON_2_1, true));
-        ghmm.addState(new HMMState(REVERSE_POSTINTRON_ONE) {
+        ghmm.addState(new ConstantLengthState(REVERSE_POSTINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 				// This is the first base of a codon
@@ -277,7 +277,7 @@ public class App
 		Viterbi viterbi = new Viterbi(ghmm, currentSequence);
 		for(List<Pair<HMMState, Integer>> parse : viterbi.computeParses()) {
 			System.out.println("\n\tWriting parse to file");
-			int currentPos = 45701;
+			int currentPos = 1;
 			
 			GFFFeature currentFeature = null;
 			int startOfCurrentFeature = -1;

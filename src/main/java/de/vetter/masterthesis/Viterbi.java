@@ -35,15 +35,26 @@ public class Viterbi {
 		// NOTE! Compute in logarithm, i.e. probability 1 is entry 0 etc; Addition instead of multiplication
 		viterbiVariables = new double[stateCount][sequence.length() + 1];
 		
+		/*long tBefore, tAfter, tBeforeFindingMax, tAfterFindingMax;
+		tBefore = System.currentTimeMillis();*/
 		// Initialisation:
 		viterbiVariables[0][0] = 0; 
 		for(int state = 1; state < stateCount; state++) {
 			viterbiVariables[state][0] = Double.NEGATIVE_INFINITY;
 		}
+		/*tAfter = System.currentTimeMillis();
+		System.out.println("Initialisation took " + (tAfter - tBefore) + "ms");*/
 		
 		// 'Recursion'
 		for(int l = 1; l < sequence.length() + 1; l++) {
+			/*tBefore = System.currentTimeMillis();
+			if (l % 100 == 0) {
+				System.out.println("0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22");
+			}*/
 			for(int q = 0; q < stateCount; q++) {
+				/*tBeforeFindingMax = System.currentTimeMillis();*/
+				if(q == 1)
+					continue;
 				double max = Double.NEGATIVE_INFINITY;
 				for (int qPrime = 0; qPrime < stateCount; qPrime++) {
 					if(model.getLogTransitionProbability(qPrime, q) > Double.NEGATIVE_INFINITY && qPrime != 1) {
@@ -65,11 +76,18 @@ public class Viterbi {
 						}
 					}
 				}
-
+				/*tAfterFindingMax = System.currentTimeMillis();
+				if (l % 100 == 0) 
+					System.out.print((tAfterFindingMax - tBeforeFindingMax) + "  ");
+				*/
+				
 				viterbiVariables[q][l] = max;
 			}
-			if (l % 100 == 0)
-				System.out.println(" done l=" + l + "/" + (sequence.length() + 1));
+			if (l % 1000 == 0) {
+				/* tAfter = System.currentTimeMillis(); */
+				System.out.println(" done l=" + l + "/" + (sequence.length() + 1)); // + "\ttook "  + (tAfter - tBefore) + "ms");
+			}
+				
 		}
 		
 		System.out.println("Computed variables!");
@@ -93,6 +111,7 @@ public class Viterbi {
 		}
 		
 		while(!workLoad.isEmpty()) {
+			System.out.println("Workload : " + workLoad.size());
 			ViterbiSeed current = workLoad.remove(0);
 			List<ViterbiSeed> stepped = current.step(viterbiVariables);
 			for(ViterbiSeed s : stepped) {

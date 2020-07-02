@@ -43,8 +43,13 @@ public class ViterbiSeed {
 		ArrayList<ViterbiSeed> result = new ArrayList<ViterbiSeed>();
 		
 		double max = Double.NEGATIVE_INFINITY;
+		// here need same optimisations as in Viterbi!
 		ArrayList<Pair<Integer, Integer>> argmaxes = new ArrayList<Pair<Integer, Integer>>();
 		for (int qPrime = 0; qPrime < viterbiVariables.length; qPrime++) {
+			if(qPrime == 1) {
+				// cannot leave terminal state, so no need to check there.
+				continue;
+			}
 			if (qPrime == 0) {
 				double candidate = viterbiVariables[qPrime][0] + model.getLogTransitionProbability(qPrime, q)
 						+ model.getLogEmissionProbability(qPrime, q, "", sequence.substring(0, l));
@@ -56,7 +61,7 @@ public class ViterbiSeed {
 					argmaxes.add(new Pair<Integer, Integer>(0, 0));
 				}
 			} else {
-				for(int lPrime = 1; lPrime < l; lPrime++) {
+				for(int lPrime : model.getState(q).iteratePermissibleLengths(l)) {
 					double candidate = viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
 							+ model.getLogEmissionProbability(qPrime, q, sequence.substring(0, lPrime),
 									sequence.substring(lPrime, l));
