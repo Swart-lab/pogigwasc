@@ -16,12 +16,12 @@ public class IntronState extends HMMState {
 	private static final int LAMBDA = 19;
 	private double[] BASE_FREQUENCIES = new double[] {0.46, 0.10, 0.355, 0.085};
 	
-	private final static int min = 12; 
-	private final static int mid = 19;
-	private final static int max = 30;
-	private final static double r = 0.5;
-	private final static double s = 0.3;
-	private final static double p = 0.45;
+	private final static int MIN = 12; 
+	private final static int MID = 19;
+	private final static int MAX = 30;
+	private final static double R = 0.3;
+	private final static double S = 0.2;
+	private final static double P = 0.45;
 	private double logA;
 	
 	// TODO: this might very well be overfitting!
@@ -30,26 +30,30 @@ public class IntronState extends HMMState {
 			0.0, 0.0 };
 	
 	private void computeLogBaseTermForFiniteBidirectionalGeometricDistribution() {
-		double leftSum = 1 - Math.pow(s, mid - min + 1);
-		leftSum = leftSum / (1-s);
-		double rightSum = 1 - Math.pow(r, max - mid + 1);
-		rightSum = rightSum / (1-r);
+		double leftSum = 1 - Math.pow(S, MID - MIN + 1);
+		leftSum = leftSum / (1-S);
+		double rightSum = 1 - Math.pow(R, MAX - MID + 1);
+		rightSum = rightSum / (1-R);
 		
-		logA = leftSum + p*rightSum;
+		logA = leftSum + P*rightSum;
 		
 		logA = -Math.log(logA);
+		
+		System.out.println("Intron-state: length-distribution:");
+		for(int k = MIN; k <= MAX; k++)
+			System.out.println("  p(" + k + ")=" + Math.exp(logProbability(k)));
 	}
 	
 	private double logProbability(int length) {
 		double result = Double.NEGATIVE_INFINITY;
-		if(length == mid)
-			result = logA + Math.log(1 + p);
+		if(length == MID)
+			result = logA + Math.log(1 + P);
 		
-		if(length >= min && length < mid)
-			result = logA + (length - min) * Math.log(s);
+		if(length >= MIN && length < MID)
+			result = logA + (length - MIN) * Math.log(S);
 		
-		if(length > mid && length <= max)
-			result = logA + Math.log(p) + (length - mid) * Math.log(r);
+		if(length > MID && length <= MAX)
+			result = logA + Math.log(P) + (length - MID) * Math.log(R);
 		
 		return result;
 	}
