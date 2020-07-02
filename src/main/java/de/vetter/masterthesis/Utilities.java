@@ -110,6 +110,8 @@ public class Utilities {
 			return result;
 		}
 	}
+
+	
 	
 	/**
 	 * Precomputing the factorials
@@ -148,4 +150,6 @@ public class Utilities {
 		for(int k = 0; k < 40; k++)
 			System.out.print(logFactorial(k) + ", ");
 	}
+	
+	
 }
