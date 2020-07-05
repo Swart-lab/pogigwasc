@@ -183,16 +183,16 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        ghmm.setTransitionProbability(2, 2, 1383d/1400d);
-        ghmm.setTransitionProbability(2, 3, 8d/1400d); // NCS -> +M
-        ghmm.setTransitionProbability(2, 15, 8d/1400d); // NCS -> -Stop
+        ghmm.setTransitionProbability(2, 2, 1387d/1400d);
+        ghmm.setTransitionProbability(2, 3, 6d/1400d); // NCS -> +M
+        ghmm.setTransitionProbability(2, 15, 6d/1400d); // NCS -> -Stop
         ghmm.setTransitionProbability(2, 1, 1d/1400d); // NCS -> terminal
         
         ghmm.setTransitionProbability(3, 4, 1d); // +M -> +CDS
         
-        double probabilityStayCDS     = 0.999999;
-        double probabilityCDSToIntron = 0.00000000000000001; // 0.000000000000001 is too big!
-        double probabilityCDSEnd      = 0.00000099999999997;
+        double probabilityStayCDS     = 0.9999999;
+        double probabilityCDSToIntron = 0.000000000000000001; // 0.000000000000001 is too big!
+        double probabilityCDSEnd      = 0.000000099999999997;
         
         ghmm.setTransitionProbability(4, 4, probabilityStayCDS); // stay in +CDS (exonlength median=960, mean=1250 -> approx 1200)
         ghmm.setTransitionProbability(4, 5, probabilityCDSEnd); // +CDS -> +Stop: from introns / gene: geometric with 0 -> empirical p ~ 61%

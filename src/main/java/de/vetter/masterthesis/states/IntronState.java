@@ -17,11 +17,11 @@ public class IntronState extends HMMState {
 	private double[] BASE_FREQUENCIES = new double[] {0.46, 0.10, 0.355, 0.085};
 	
 	private final static int MIN = 12; 
-	private final static int MID = 19;
+	private final static int MID = 18;
 	private final static int MAX = 30;
-	private final static double R = 0.3;
-	private final static double S = 0.2;
-	private final static double P = 0.45;
+	private final static double R = 0.6;
+	private final static double S = 0.4;
+	private final static double P = 0.55;
 	private double logA;
 	
 	// TODO: this might very well be overfitting!
@@ -30,29 +30,42 @@ public class IntronState extends HMMState {
 			0.0, 0.0 };
 	
 	private void computeLogBaseTermForFiniteBidirectionalGeometricDistribution() {
-		double leftSum = 1 - Math.pow(S, MID - MIN + 1);
+		double leftSum = 1 - Math.pow(S, MID - MIN); //  + 1);
 		leftSum = leftSum / (1-S);
 		double rightSum = 1 - Math.pow(R, MAX - MID + 1);
 		rightSum = rightSum / (1-R);
+		
+		System.out.println("Left sum=" + leftSum + "\tvs\t" + (P*rightSum) + "=Right sum");
 		
 		logA = leftSum + P*rightSum;
 		
 		logA = -Math.log(logA);
 		
+		
 		System.out.println("Intron-state: length-distribution:");
-		for(int k = MIN; k <= MAX; k++)
-			System.out.println("  p(" + k + ")=" + Math.exp(logProbability(k)));
+		System.out.println("l,p,poisson,empirical");
+		double sum = 0;
+		for(int k = 10; k <= MAX + 1; k++) {
+			double poisson = k * Math.log(LAMBDA) - LAMBDA;
+			poisson -= Utilities.logFactorial(k);
+			System.out.println(k + "," + Math.exp(logProbability(k)) + "," + Math.exp(poisson) + ","
+					+ (k < LENGTH_PROBABILITIES.length ? LENGTH_PROBABILITIES[k] : 0));
+			sum += Math.exp(logProbability(k));
+		}
+		System.out.println("sum=" + sum);
+		/* */
 	}
 	
 	private double logProbability(int length) {
 		double result = Double.NEGATIVE_INFINITY;
-		if(length == MID)
-			result = logA + Math.log(1 + P);
+		//if(length == MID)
+		//	result = logA + Math.log(1 + P);
+		// and 2nd if: MID < length ...
 		
-		if(length >= MIN && length < MID)
-			result = logA + (length - MIN) * Math.log(S);
+		if(MIN <= length && length < MID)
+			result = logA + (MID - length - 1) * Math.log(S);
 		
-		if(length > MID && length <= MAX)
+		if(MID <= length && length <= MAX)
 			result = logA + Math.log(P) + (length - MID) * Math.log(R);
 		
 		return result;
@@ -79,7 +92,7 @@ public class IntronState extends HMMState {
 		// log Poisson = k log(lambda) - lambda - log(k!)
 		/*
 		double lengthProb = newEmission.length() * Math.log(LAMBDA) - LAMBDA;
-		poisson -= Utilities.logFactorial(newEmission.length()); // TODO: might abbreviate here
+		lengthProb -= Utilities.logFactorial(newEmission.length()); // TODO: might abbreviate here
 		*/
 		// double lengthProb = Math.log(LENGTH_PROBABILITIES[newEmission.length()]);
 		double lengthProb = logProbability(newEmission.length());
