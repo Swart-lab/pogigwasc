@@ -12,9 +12,15 @@ public class ViterbiSeed {
 	
 	private GHMM model;
 	private String sequence;
+	private boolean abbreviating = false;
 	private int q, l;
 	private ViterbiSeed previous;
 
+	public ViterbiSeed(GHMM model, String sequence, int q, int l, ViterbiSeed previous, boolean abbreviate) {
+		this(model, sequence, q, l, previous);
+		this.abbreviating = abbreviate;
+	}
+	
 	public ViterbiSeed(GHMM model, String sequence, int q, int l, ViterbiSeed previous) {
 		this.model = model;
 		this.sequence = sequence;
@@ -63,7 +69,8 @@ public class ViterbiSeed {
 			} else {
 				for(int lPrime : model.getState(q).iteratePermissibleLengths(l)) {
 					double candidate = viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
-							+ model.getLogEmissionProbability(qPrime, q, sequence.substring(0, lPrime),
+							+ model.getLogEmissionProbability(qPrime, q, 
+									abbreviating ? null : sequence.substring(0, lPrime),
 									sequence.substring(lPrime, l));
 					if(max <= candidate) {
 						if (max < candidate) {
@@ -77,7 +84,7 @@ public class ViterbiSeed {
 		}
 
 		for(Pair<Integer, Integer> p : argmaxes) {
-			result.add(new ViterbiSeed(model, sequence, p.getFirst(), p.getSecond(), this));
+			result.add(new ViterbiSeed(model, sequence, p.getFirst(), p.getSecond(), this, abbreviating));
 		}
 		
 		return result;

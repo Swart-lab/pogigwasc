@@ -16,6 +16,8 @@ public class Viterbi {
 	private GHMM model;
 	private String sequence;
 	
+	private boolean abbreviating = false;
+	
 	/**
 	 * Constructor: Checks given model for transition-validity
 	 * @param model: Has to have its transition matrix set and valid
@@ -28,6 +30,18 @@ public class Viterbi {
 		}
 		this.model = model;
 		this.sequence = sequence;
+	}
+	
+	public void setAbbreviating(boolean abbreviate) {
+		this.abbreviating = abbreviate;
+	}
+	
+	/**
+	 * 
+	 * @return whether this viterbi-instance is abbreviating the emission-probability-computation by omitting the emission-history
+	 */
+	public boolean isAbbreviating() {
+		return abbreviating;
 	}
 	
 	private void computeViterbiVariables() {
@@ -62,7 +76,7 @@ public class Viterbi {
 							// this causes slowdown: for large L, no point in doing this;
 							max = Math.max(max,
 									viterbiVariables[qPrime][0] + model.getLogTransitionProbability(qPrime, q)
-											+ model.getLogEmissionProbability(0, q, sequence.substring(0, 0),
+											+ model.getLogEmissionProbability(0, q, "",
 													sequence.substring(0, l)));
 						} else {
 							// q' \in Q, i.e. neither initial nor terminal state (cannot come from the terminal state)
@@ -70,7 +84,8 @@ public class Viterbi {
 							for(int lPrime : model.getState(q).iteratePermissibleLengths(l)) {
 								max = Math.max(max,
 										viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
-												+ model.getLogEmissionProbability(qPrime, q, sequence.substring(0, lPrime),
+												+ model.getLogEmissionProbability(qPrime, q,
+														abbreviating ? null : sequence.substring(0, lPrime),
 														sequence.substring(lPrime, l)));
 							}
 						}
@@ -106,7 +121,7 @@ public class Viterbi {
 					initialMax = candidate;
 					workLoad.clear();
 				}
-				workLoad.add(new ViterbiSeed(model, sequence, q1, sequence.length(), null)); // the ends of the parses point to null.
+				workLoad.add(new ViterbiSeed(model, sequence, q1, sequence.length(), null, abbreviating)); // the ends of the parses point to null.
 			}
 		}
 		

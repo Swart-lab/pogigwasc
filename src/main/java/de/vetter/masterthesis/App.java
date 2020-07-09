@@ -273,6 +273,7 @@ public class App
     public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence) throws IOException {
     	System.out.println("\nParses for " + currentHeader + ":\n");
 		Viterbi viterbi = new Viterbi(ghmm, currentSequence);
+		viterbi.setAbbreviating(true);
 		for(List<Pair<HMMState, Integer>> parse : viterbi.computeParses()) {
 			System.out.println("\n\tWriting parse to file");
 			int currentPos = 1;

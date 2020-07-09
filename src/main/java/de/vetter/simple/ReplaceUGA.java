@@ -311,8 +311,8 @@ public class ReplaceUGA {
 
 		// 15 seems to be underpowered
 		int upstream = 18; // 18;
-		int downstream = 18;
-		boolean baseWise = true;
+		int downstream = 24;
+		boolean baseWise = false;
 
 		// step 1.a)
 		findStopOccurrences(occurrences, sequence, upstream, downstream, true, baseWise);
