@@ -196,19 +196,23 @@ public class ReplaceUGA {
 	 * @param after
 	 * @return log probability
 	 */
-	public static double sense(String before, String after) {
+	public static double sense(String before, String after, boolean baseWise) {
 		double logProbability = 0;
-		/*
-		 * for(char c : before.toCharArray()) { logProbability +=
-		 * getLogProbabilityBaseCDS(c); } for(char c : after.toCharArray()) {
-		 * logProbability += getLogProbabilityBaseCDS(c); }
-		 */
-
-		for (int i = 0; i < before.length() - 3; i += 3) {
-			logProbability += getLogProbabilityGeneral(before.substring(i, i + 3));
-		}
-		for (int i = 0; i < after.length() - 3; i += 3) {
-			logProbability += getLogProbabilityGeneral(after.substring(i, i + 3));
+		
+		if(baseWise) {
+			for (char c : before.toCharArray()) {
+				logProbability += getLogProbabilityBaseCDS(c);
+			}
+			for (char c : after.toCharArray()) {
+				logProbability += getLogProbabilityBaseCDS(c);
+			}
+		} else {
+			for (int i = 0; i < before.length() - 3; i += 3) {
+				logProbability += getLogProbabilityGeneral(before.substring(i, i + 3));
+			}
+			for (int i = 0; i < after.length() - 3; i += 3) {
+				logProbability += getLogProbabilityGeneral(after.substring(i, i + 3));
+			}	
 		}
 		return logProbability;
 	}
@@ -221,20 +225,25 @@ public class ReplaceUGA {
 	 * @param after
 	 * @return log probability
 	 */
-	public static double stop(String before, String after) {
+	public static double stop(String before, String after, boolean baseWise) {
 		double logProbability = 0;
-		/*
-		 * for(char c : before.toCharArray()) { logProbability +=
-		 * getLogProbabilityBaseCDS(c); } for(char c : after.toCharArray()) {
-		 * logProbability += getLogProbabilityBaseUTR(c); }
-		 */
-		for (int i = 0; i < before.length() - 3; i += 3) {
-			logProbability += getLogProbabilityRestricted(before.substring(i, i + 3));
+		
+		if(baseWise) {
+			for (char c : before.toCharArray()) {
+				logProbability += getLogProbabilityBaseCDS(c);
+			}
+			for (char c : after.toCharArray()) {
+				logProbability += getLogProbabilityBaseUTR(c);
+			}
+		} else {
+			for (int i = 0; i < before.length() - 3; i += 3) {
+				logProbability += getLogProbabilityRestricted(before.substring(i, i + 3));
+			}
+			for (char c : after.toCharArray()) {
+				logProbability += getLogProbabilityBaseUTR(c);
+			}
 		}
-		for (char c : after.toCharArray()) {
-			logProbability += getLogProbabilityBaseUTR(c);
-		}
-
+		
 		return logProbability;
 	}
 
@@ -253,7 +262,7 @@ public class ReplaceUGA {
 	 *                    will be marked by a negative sign.
 	 */
 	public static void findStopOccurrences(List<Integer> occurrences, String sequence, int upstream, int downstream,
-			boolean forward) {
+			boolean forward, boolean baseWise) {
 		// TODO: this should better be: upstream is in codons, and currentUpstream is in
 		// nt (no possibility of unthreeven windows)
 		int currentUpstream = upstream;
@@ -270,11 +279,11 @@ public class ReplaceUGA {
 			String before = sequence.substring(i - currentUpstream, i);
 			String after = sequence.substring(i + 3, i + 3 + currentDownstream);
 
-			double logProbabilityStop = stop(before, after);
-			double logProbabilitySense = sense(before, after);
+			double logProbabilityStop = stop(before, after, baseWise);
+			double logProbabilitySense = sense(before, after, baseWise);
 			double logProbabilityNCS = noncoding(before, after);
 
-			if (logProbabilityStop > logProbabilityNCS && logProbabilityStop > logProbabilitySense) {
+			if (logProbabilityStop > logProbabilitySense || logProbabilityNCS > logProbabilitySense) {
 				occurrences.add(forward ? i : (i - sequence.length() + 3));
 			}
 
@@ -301,12 +310,13 @@ public class ReplaceUGA {
 		ArrayList<Integer> occurrences = new ArrayList<Integer>();
 
 		// 15 seems to be underpowered
-		int upstream = 24; // 18;
+		int upstream = 18; // 18;
 		int downstream = 18;
+		boolean baseWise = true;
 
 		// step 1.a)
-		findStopOccurrences(occurrences, sequence, upstream, downstream, true);
-		findStopOccurrences(occurrences, reverseComplement(sequence), upstream, downstream, false);
+		findStopOccurrences(occurrences, sequence, upstream, downstream, true, baseWise);
+		findStopOccurrences(occurrences, reverseComplement(sequence), upstream, downstream, false, baseWise);
 
 		boolean found = false;
 
