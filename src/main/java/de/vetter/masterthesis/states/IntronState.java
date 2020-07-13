@@ -53,14 +53,12 @@ public class IntronState extends HMMState {
 		leftSum = leftSum / (1-S);
 		double rightSum = 1 - Math.pow(R, MAX - MID + 1);
 		rightSum = rightSum / (1-R);
-		
-		System.out.println("Left sum=" + leftSum + "\tvs\t" + (P*rightSum) + "=Right sum");
-		
+				
 		logA = leftSum + P*rightSum;
 		
 		logA = -Math.log(logA);
 		
-		
+		/* 
 		System.out.println("Intron-state: length-distribution:");
 		System.out.println("l,p,poisson,empirical");
 		double sum = 0;
@@ -72,7 +70,7 @@ public class IntronState extends HMMState {
 			sum += Math.exp(logProbability(k));
 		}
 		System.out.println("sum=" + sum);
-		/* */
+		*/
 	}
 	
 	private double logProbability(int length) {
@@ -120,10 +118,11 @@ public class IntronState extends HMMState {
 		
 		double baseUsage = 0;
 		/* GT AG have probability 1 */
+		/*
 		for(char b : newEmission.substring(2, newEmission.length() - 2).toCharArray())
 			baseUsage += Math.log(BASE_FREQUENCIES[Utilities.baseToIndex(b)]);
+		*/
 		
-		/*
 		for(int i = 0; i < length; i++) {
 			if(i < SDS_SIZE) {
 				baseUsage += Math.log(BASE_FREQUENCIES_SDS[i][Utilities.baseToIndex(newEmission.charAt(i))]);
@@ -133,7 +132,7 @@ public class IntronState extends HMMState {
 				baseUsage += Math.log(BASE_FREQUENCIES[Utilities.baseToIndex(newEmission.charAt(i))]);
 			}
 		}
-		*/
+		
 		
 		return lengthProb + baseUsage;
 	}

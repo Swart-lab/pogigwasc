@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import de.vetter.masterthesis.states.*;
 
@@ -41,13 +43,28 @@ public class App
 	
     public static void main( String[] args ) throws IOException
     {
-    	if(args.length != 2) {
-    		System.out.println("usage: > ___.jar [input sequences].fasta [output-file].gff");
+    	LocalDateTime now = LocalDateTime.now();
+    	if(args.length != 1 && args.length != 2) {
+    		System.out.println("usage: > ___.jar [input sequences].fasta (optional 2nd arg: [output-file].gff)");
     		return;
     	}
     	
+    	BufferedWriter writer;
+    	if(args.length == 1) {
+    		// cut of the .fasta (or something like .fa)
+    		String genericOutputFilename = args[0].substring(0, args[0].lastIndexOf("."));
+    		genericOutputFilename += "-day" + DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss").format(now);
+    		genericOutputFilename += ".predicted.gff";
+    		
+    		writer = new BufferedWriter(new FileWriter(genericOutputFilename));
+    	} else {
+    		writer = new BufferedWriter(new FileWriter(args[1]));
+    	}
+    	
+    	
+    	
     	BufferedReader reader = new BufferedReader(new FileReader(new File(args[0])));
-    	BufferedWriter writer = new BufferedWriter(new FileWriter(args[1]));
+    	
     	
     	// double a = Double.NEGATIVE_INFINITY;
         // System.out.println( "Hello World!" );
@@ -183,16 +200,18 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        ghmm.setTransitionProbability(2, 2, 1387d/1400d);
-        ghmm.setTransitionProbability(2, 3, 6d/1400d); // NCS -> +M
-        ghmm.setTransitionProbability(2, 15, 6d/1400d); // NCS -> -Stop
-        ghmm.setTransitionProbability(2, 1, 1d/1400d); // NCS -> terminal
+        double probabilityStayNCS = 1495d/1500d;
+        
+        ghmm.setTransitionProbability(2, 2, probabilityStayNCS);
+        ghmm.setTransitionProbability(2, 3, 0.4 * (1-probabilityStayNCS)); // NCS -> +M
+        ghmm.setTransitionProbability(2, 15, 0.4 * (1-probabilityStayNCS)); // NCS -> -Stop
+        ghmm.setTransitionProbability(2, 1, 0.2 * (1-probabilityStayNCS)); // NCS -> terminal
         
         ghmm.setTransitionProbability(3, 4, 1d); // +M -> +CDS
         
-        double probabilityStayCDS     = 0.9999999;
-        double probabilityCDSToIntron = 0.000000000000000001; // 0.000000000000001 is too big!
-        double probabilityCDSEnd      = 0.000000099999999997;
+        double probabilityStayCDS     = 0.9999; // cf. QueryAnnotation.ipynb; still manually adapted
+        double probabilityCDSEnd      = (1d-probabilityStayCDS) * 0.62;
+        double probabilityCDSToIntron = (1d - probabilityStayCDS - probabilityCDSEnd) / 3d; // 0.000000000000001 is too big!
         
         ghmm.setTransitionProbability(4, 4, probabilityStayCDS); // stay in +CDS (exonlength median=960, mean=1250 -> approx 1200)
         ghmm.setTransitionProbability(4, 5, probabilityCDSEnd); // +CDS -> +Stop: from introns / gene: geometric with 0 -> empirical p ~ 61%
@@ -235,8 +254,19 @@ public class App
         
         System.out.println(ghmm);
         
+          
+        writer.write("##gff-version 3");
+        writer.newLine();
+        writer.write("##Generated on: " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
+        writer.newLine();
+        writer.write("##Source file: " + args[0]); writer.newLine();
+        writer.write("## Some probabilities: "); writer.newLine();
+        writer.write("## p(NCS->NCS)=" + probabilityStayNCS); writer.newLine();
+        writer.write("## p(CDS->CDS)=" + probabilityStayCDS); writer.newLine();
+        writer.write("## p(CDS->Stop)=" + probabilityCDSEnd); writer.newLine();
         
-        /** Now read in the fasta file sequence for sequence, and for each sequence generate a gff-output */
+        
+        /** Now read in the fasta file sequence for sequence, and for each sequence generate a gff-output */        
         String currentHeader = null;
 		String currentSequence = null;
 
