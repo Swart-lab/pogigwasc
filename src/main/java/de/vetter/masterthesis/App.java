@@ -200,7 +200,7 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        double probabilityStayNCS = 1495d/1500d;
+        double probabilityStayNCS = 1795d/1800d;
         
         ghmm.setTransitionProbability(2, 2, probabilityStayNCS);
         ghmm.setTransitionProbability(2, 3, 0.4 * (1-probabilityStayNCS)); // NCS -> +M
@@ -209,7 +209,7 @@ public class App
         
         ghmm.setTransitionProbability(3, 4, 1d); // +M -> +CDS
         
-        double probabilityStayCDS     = 0.9999; // cf. QueryAnnotation.ipynb; still manually adapted
+        double probabilityStayCDS     = 0.99995; // cf. QueryAnnotation.ipynb; still manually adapted
         double probabilityCDSEnd      = (1d-probabilityStayCDS) * 0.62;
         double probabilityCDSToIntron = (1d - probabilityStayCDS - probabilityCDSEnd) / 3d; // 0.000000000000001 is too big!
         
