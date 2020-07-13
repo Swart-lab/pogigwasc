@@ -16,6 +16,25 @@ public class IntronState extends HMMState {
 	private static final int LAMBDA = 19;
 	private double[] BASE_FREQUENCIES = new double[] {0.46, 0.10, 0.355, 0.085};
 	
+	private int SDS_SIZE = 5;
+	/** 5' end of intron (splice donor site): start with GT~A~A; (pos, base) */
+	private double[][] BASE_FREQUENCIES_SDS = new double[][] {
+		{0d, 0d, 0d, 1d},
+		{1d, 0d, 0d, 0d},
+		{0.02, 0.02, 0.94, 0.02},
+		{0.02, 0.02, 0.94, 0.02},
+		{0.35, 0.05, 0.15, 0.45}
+	};
+	
+	private int SAS_SIZE = 4;
+	/** 3' end of intron: end with ~T/A~T; (pos, base) */
+	private double[][] BASE_FREQUENCIES_SAS = new double[][] {
+		{0.45, 0.05, 0.35, 0.15},
+		{0.65, 0.25, 0.05, 0.05},
+		{0d, 0d, 1d, 0d},
+		{0d, 0d, 0d, 1d}
+	};
+	
 	private final static int MIN = 12; 
 	private final static int MID = 18;
 	private final static int MAX = 30;
@@ -88,6 +107,8 @@ public class IntronState extends HMMState {
 		if(! (newEmission.startsWith("GT") && newEmission.endsWith("AG")))
 			return Double.NEGATIVE_INFINITY;
 		
+		int length = newEmission.length();
+		
 		// lambda = 19
 		// log Poisson = k log(lambda) - lambda - log(k!)
 		/*
@@ -95,12 +116,24 @@ public class IntronState extends HMMState {
 		lengthProb -= Utilities.logFactorial(newEmission.length()); // TODO: might abbreviate here
 		*/
 		// double lengthProb = Math.log(LENGTH_PROBABILITIES[newEmission.length()]);
-		double lengthProb = logProbability(newEmission.length());
+		double lengthProb = logProbability(length);
 		
 		double baseUsage = 0;
-		// GT AG have probability 1
+		/* GT AG have probability 1 */
 		for(char b : newEmission.substring(2, newEmission.length() - 2).toCharArray())
-			baseUsage += BASE_FREQUENCIES[Utilities.baseToIndex(b)];
+			baseUsage += Math.log(BASE_FREQUENCIES[Utilities.baseToIndex(b)]);
+		
+		/*
+		for(int i = 0; i < length; i++) {
+			if(i < SDS_SIZE) {
+				baseUsage += Math.log(BASE_FREQUENCIES_SDS[i][Utilities.baseToIndex(newEmission.charAt(i))]);
+			} else if (i >= length - SAS_SIZE) {
+				baseUsage += Math.log(BASE_FREQUENCIES_SAS[i - (length - SAS_SIZE)][Utilities.baseToIndex(newEmission.charAt(i))]);
+			} else {
+				baseUsage += Math.log(BASE_FREQUENCIES[Utilities.baseToIndex(newEmission.charAt(i))]);
+			}
+		}
+		*/
 		
 		return lengthProb + baseUsage;
 	}
