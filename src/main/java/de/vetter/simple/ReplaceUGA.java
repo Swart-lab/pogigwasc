@@ -120,7 +120,7 @@ public class ReplaceUGA {
 	 */
 	public static double getLogProbabilityGeneral(String codon) {
 		if (!standardCodon.matcher(codon).matches()) {
-			// TODO ^
+			// TODO ^ marginalise?
 			System.out.println("\tNonstandard codon " + codon);
 			return getLogProbabilityBaseCDS(codon.charAt(0)) + getLogProbabilityBaseCDS(codon.charAt(1))
 					+ getLogProbabilityBaseCDS(codon.charAt(2));

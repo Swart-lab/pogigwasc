@@ -42,7 +42,6 @@ public class GHMM {
 	 * Call this after adding all the states
 	 */
 	public void initialiseTransitionMatrix() {
-		// TODO: add option to initialise all-zero-matrix
 		int n = states.size();
 		logTransitions = new double[n][n];
 		for(int from = 0; from < n; from++) {

@@ -65,10 +65,6 @@ public class App
     	
     	BufferedReader reader = new BufferedReader(new FileReader(new File(args[0])));
     	
-    	
-    	// double a = Double.NEGATIVE_INFINITY;
-        // System.out.println( "Hello World!" );
-        // System.out.println("2^" + a + "=" + Math.pow(2, a));
         
         // TODO: preprocess: replace N? Definitely toUpperCase
         

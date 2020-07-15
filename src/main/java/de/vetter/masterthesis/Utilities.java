@@ -19,6 +19,15 @@ public class Utilities {
 			{ 0.30, 0.18, 0.37, 0.15 },
 			{ 0.36, 0.12, 0.38, 0.14 } };
 
+		
+	/** (pos, base), cf. StopCodons.ipynb -- correct only 4 select codons */
+	private static final double[][] BASE_PROBABILITIES_STOPREGION = new double[][] {
+		{0.24, 0.14, 0.355, 0.265},
+		{0.32, 0.16, 0.36, 0.16},
+		{0.33, 0.15, 0.34, 0.18}
+	};
+			
+	// TODO: clearly overfitting!
 	private static final double[] CODON_PROBABILITIES_STOPREGION = new double[] {
 			0.036, 0.024, 0.027, 0.019, 0.017, 0.003, 0.014, 0.004, 
 			0.026, 0.012, 0.002, 0.015, 0.011, 0.008,     0, 0.021, 
@@ -90,7 +99,30 @@ public class Utilities {
 	}
 	
 	public static double getLogCodonProbabilityStopRegion(String codon) {
-		return Math.log(CODON_PROBABILITIES_STOPREGION[codonToIndex(codon)]);
+		double result = 0d;
+		// Special cases: Determined from StopRegions.ipynb and prior: UGA, UAA are
+		// depleted, use AAG and AAA for correcting this in the distribution
+		switch (codon) {
+		case "TGA":
+			return Double.NEGATIVE_INFINITY;
+		case "TAA":
+			return Math.log(0.0018); // rounded empirical, cf. StopCodons.ipynb
+		case "AAG":
+			return Math.log(0.047);
+		case "AAA":
+			return Math.log(0.060088);
+		default:
+			break;
+		}
+
+		// for all the rest: use base-wise (and rounded) approximation to avoid
+		// overfitting
+		for (int i = 0; i < 3; i++) {
+			result += Math.log(BASE_PROBABILITIES_STOPREGION[i][baseToIndex(codon.charAt(i))]);
+		}
+		
+		// return Math.log(CODON_PROBABILITIES_STOPREGION[codonToIndex(codon)]);
+		return result;
 	}
 	
 	

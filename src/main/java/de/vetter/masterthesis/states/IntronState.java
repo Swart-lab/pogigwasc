@@ -43,7 +43,7 @@ public class IntronState extends HMMState {
 	private final static double P = 0.55;
 	private double logA;
 	
-	// TODO: this might very well be overfitting!
+	// TODO: using this would be overfitting -- but keep here for comparison with the used distr (-> for use in LaTeX)
 	private double[] LENGTH_PROBABILITIES = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
 			0.0, 0.0, 0.0, 0.0, 0.2188, 0.2812, 0.1042, 0.2292, 0.1146, 0.0208, 0.0104, 0.0104, 0.0, 0.0, 0.0104, 0.0,
 			0.0, 0.0 };
@@ -111,7 +111,7 @@ public class IntronState extends HMMState {
 		// log Poisson = k log(lambda) - lambda - log(k!)
 		/*
 		double lengthProb = newEmission.length() * Math.log(LAMBDA) - LAMBDA;
-		lengthProb -= Utilities.logFactorial(newEmission.length()); // TODO: might abbreviate here
+		lengthProb -= Utilities.logFactorial(newEmission.length()); 
 		*/
 		// double lengthProb = Math.log(LENGTH_PROBABILITIES[newEmission.length()]);
 		double lengthProb = logProbability(length);

@@ -19,7 +19,6 @@ public class CodingState extends HMMState {
 
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-		// TODO Codon usage or some approximation (maybe always use empirical distr. of base 1, to avoid overfitting?)
 		if(newEmission.length() != 3)
 			return Double.NEGATIVE_INFINITY;
 		
