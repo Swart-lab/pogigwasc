@@ -10,7 +10,7 @@ public class StartRegionState extends HMMState {
 	public static final int START_REGION_LENGTH = 6;
 	
 	/** TCAG */
-	private static final double[] UPSTREAM_BASE_USAGE = new double[] {0.15, 0.02, 0.078, 0.05};
+	private static final double[] UPSTREAM_BASE_USAGE = new double[] {0.15, 0.02, 0.78, 0.05};
 	
 	public StartRegionState(String name, boolean strand) {
 		super(name);

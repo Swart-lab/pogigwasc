@@ -198,7 +198,7 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        double probabilityStayNCS = 1395d/1400d;
+        double probabilityStayNCS = 1695d/1700d;
         
         ghmm.setTransitionProbability(2, 2, probabilityStayNCS);
         ghmm.setTransitionProbability(2, 3, 0.4 * (1-probabilityStayNCS)); // NCS -> +M
