@@ -72,7 +72,8 @@ public class App
         ghmm.addState(new NoncodingState(NCS));
         
         /** FORWARD STRAND */
-        ghmm.addState(new FixedSequenceState(FORWARD_START, "ATG")); // Name states + for forward, and - for backward strand
+        ghmm.addState(new StartRegionState(FORWARD_START, true));
+        // ghmm.addState(new FixedSequenceState(FORWARD_START, "ATG")); // Name states + for forward, and - for backward strand
         ghmm.addState(new CodingState(FORWARD_CDS, true));
         ghmm.addState(new StopRegionState(FORWARD_STOP, true));
         
@@ -129,7 +130,8 @@ public class App
         
         
         /** REVERSE STRAND */
-        ghmm.addState(new FixedSequenceState(REVERSE_START, "CAT")); // Name states + for forward, and - for backward strand
+        ghmm.addState(new StartRegionState(REVERSE_START, false));
+        // ghmm.addState(new FixedSequenceState(REVERSE_START, "CAT")); // Name states + for forward, and - for backward strand
         ghmm.addState(new CodingState(REVERSE_CDS, false));
         ghmm.addState(new StopRegionState(REVERSE_STOP, false));
         
@@ -174,7 +176,7 @@ public class App
 						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
 			}
         });
-        ghmm.addState(new IntronState(REVERSE_INTRON_2_1, true));
+        ghmm.addState(new IntronState(REVERSE_INTRON_2_1, false));
         ghmm.addState(new ConstantLengthState(REVERSE_POSTINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
@@ -196,7 +198,7 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        double probabilityStayNCS = 1795d/1800d;
+        double probabilityStayNCS = 1395d/1400d;
         
         ghmm.setTransitionProbability(2, 2, probabilityStayNCS);
         ghmm.setTransitionProbability(2, 3, 0.4 * (1-probabilityStayNCS)); // NCS -> +M
@@ -335,7 +337,8 @@ public class App
 					}
 
 					if (currentFeature != GFFFeature.CDS)
-						startOfCurrentFeature = currentPos;
+						startOfCurrentFeature = state.getName().equals(FORWARD_START) ? currentPos + 3 : currentPos;
+					// TODO ^ notice this! It is for the new StartRegion-state!
 					currentFeature = GFFFeature.CDS;
 
 					break;
