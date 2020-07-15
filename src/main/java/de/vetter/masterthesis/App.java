@@ -66,7 +66,7 @@ public class App
     	BufferedReader reader = new BufferedReader(new FileReader(new File(args[0])));
     	
         
-        // TODO: preprocess: replace N? Definitely toUpperCase
+        // TODO: preprocess: replace N? No, just throw a small error asking the user to provide a contig, not a scaffold.
         
         GHMM ghmm = new GHMM();
         ghmm.addState(new NoncodingState(NCS));

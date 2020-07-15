@@ -102,7 +102,7 @@ public class Utilities {
 		double result = 0d;
 		// Special cases: Determined from StopRegions.ipynb and prior: UGA, UAA are
 		// depleted, use AAG and AAA for correcting this in the distribution
-		/*
+		
 		switch (codon) {
 		case "TGA":
 			return Double.NEGATIVE_INFINITY;
@@ -121,9 +121,10 @@ public class Utilities {
 		for (int i = 0; i < 3; i++) {
 			result += Math.log(BASE_PROBABILITIES_STOPREGION[i][baseToIndex(codon.charAt(i))]);
 		}
-		*/
-
+		
+		/*
 		result = Math.log(CODON_PROBABILITIES_STOPREGION[codonToIndex(codon)]);
+		*/
 		return result;
 	}
 	
