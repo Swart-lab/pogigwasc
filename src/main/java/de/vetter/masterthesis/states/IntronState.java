@@ -13,7 +13,7 @@ import de.vetter.masterthesis.Utilities;
 public class IntronState extends HMMState {
 
 	private boolean strand;
-	private static final int LAMBDA = 19;
+	
 	private double[] BASE_FREQUENCIES = new double[] {0.46, 0.10, 0.355, 0.085};
 	
 	private int SDS_SIZE = 5;
@@ -43,10 +43,7 @@ public class IntronState extends HMMState {
 	private final static double P = 0.55;
 	private double logA;
 	
-	// TODO: using this would be overfitting -- but keep here for comparison with the used distr (-> for use in LaTeX)
-	private double[] LENGTH_PROBABILITIES = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-			0.0, 0.0, 0.0, 0.0, 0.2188, 0.2812, 0.1042, 0.2292, 0.1146, 0.0208, 0.0104, 0.0104, 0.0, 0.0, 0.0104, 0.0,
-			0.0, 0.0 };
+
 	
 	private void computeLogBaseTermForFiniteBidirectionalGeometricDistribution() {
 		double leftSum = 1 - Math.pow(S, MID - MIN); //  + 1);
@@ -96,7 +93,7 @@ public class IntronState extends HMMState {
 
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-		if(newEmission.length() < 4 || newEmission.length() >= LENGTH_PROBABILITIES.length)
+		if(newEmission.length() < 4 || newEmission.length() > MAX)
 			return Double.NEGATIVE_INFINITY;
 		
 		if(!strand)
