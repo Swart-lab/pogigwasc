@@ -113,7 +113,7 @@ public class ModelParameters {
 			stopCorrections = stopCorrections.substring(1, stopCorrections.length() - 1); // remove {}-frame
 			for (String c : stopCorrections.split(",")) {
 				String[] pair = c.split(":");
-				if (!c.contains(":") || pair.length != 2) {
+				if (pair.length != 2) {
 					problemDetails = " or malformatted: '" + c
 							+ "' cannot be analysed as a CODON:Probability-pair";
 					throw new IOException(); // this will be caught by the catch just below.

@@ -2,21 +2,19 @@ package de.vetter.masterthesis.states;
 
 import java.util.Iterator;
 
-import de.vetter.masterthesis.Utilities;
+import de.vetter.masterthesis.ModelParameters;
 
-public class NoncodingState extends HMMState {
+public class NoncodingState extends HMMStateWithStrandAndParameters {
 
-	// TODO: preferably read this from parameter-file, also make symmetric?
-	private final double[] BASE_FREQUENCIES = new double[] {0.46, 0.10, 0.355, 0.085};
-	
-	public NoncodingState(String name) { super(name); }
+	public NoncodingState(String name, ModelParameters params) { super(name, true, params); }
 
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 		if(newEmission.length() > 1) {
 			return Double.NEGATIVE_INFINITY;
 		}
-		return Math.log(BASE_FREQUENCIES[Utilities.baseToIndex(newEmission.charAt(0))]);
+		
+		return parameters.getLogBaseProbabilityNCS(newEmission.charAt(0));
 	}
 	
 	/**

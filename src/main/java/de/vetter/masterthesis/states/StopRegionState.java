@@ -2,22 +2,21 @@ package de.vetter.masterthesis.states;
 
 import java.util.Iterator;
 
+import de.vetter.masterthesis.ModelParameters;
 import de.vetter.masterthesis.Utilities;
 
-public class StopRegionState extends HMMState {
-	private boolean strand;
+public class StopRegionState extends HMMStateWithStrandAndParameters {
 	
-	public StopRegionState(String name, boolean strand) { 
-		super(name);
-		this.strand = strand;
+	public StopRegionState(String name, boolean strand, ModelParameters parameters) { 
+		super(name, strand, parameters);
 	}
 
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-		if(newEmission.length() != 24)
+		if(newEmission.length() != parameters.getStopRegionSize())
 			return Double.NEGATIVE_INFINITY;
 		
-		if(!strand) {
+		if(isReverse()) {
 			newEmission = Utilities.reverseComplement(newEmission);
 		}
 		
@@ -25,8 +24,8 @@ public class StopRegionState extends HMMState {
 			return Double.NEGATIVE_INFINITY;
 		
 		double result = 0;
-		for(int i = 0; i < 21; i += 3)
-			result += Utilities.getLogCodonProbabilityStopRegion(newEmission.substring(i, i+3));
+		for(int i = 0; i < parameters.getStopRegionSize() - 3; i += 3)
+			result += parameters.getLogCodonProbabilityStopRegion(newEmission.substring(i, i+3));
 		
 		return result;
 	}
@@ -41,7 +40,7 @@ public class StopRegionState extends HMMState {
 			@Override
 			public Iterator<Integer> iterator() {
 				return new Iterator<Integer>() {
-					private int currentLPrime = Math.max(0, l - 24);
+					private int currentLPrime = Math.max(0, l - parameters.getStopRegionSize());
 					
 					@Override
 					public boolean hasNext() {

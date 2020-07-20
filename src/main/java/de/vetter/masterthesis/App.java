@@ -49,36 +49,44 @@ public class App
     		return;
     	}
     	
+    	/** File management */
+    	
+    	File input = new File(args[0]);
+    	BufferedReader reader = new BufferedReader(new FileReader(input));
+    	
+    	File output;
     	BufferedWriter writer;
     	if(args.length == 1) {
-    		// cut of the .fasta (or something like .fa)
+    		// cut off the .fasta (or something like .fa)
     		String genericOutputFilename = args[0].substring(0, args[0].lastIndexOf("."));
     		genericOutputFilename += "-day" + DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss").format(now);
     		genericOutputFilename += ".predicted.gff";
     		
-    		writer = new BufferedWriter(new FileWriter(genericOutputFilename));
+    		output = new File(genericOutputFilename);
     	} else {
-    		writer = new BufferedWriter(new FileWriter(args[1]));
+    		output = new File(args[1]);
     	}
     	
+    	writer = new BufferedWriter(new FileWriter(output));
     	
-    	
-    	BufferedReader reader = new BufferedReader(new FileReader(new File(args[0])));
-    	
+    	// TODO: allow parameter-file to be supplied as cmd-line option
+    	File parameterFile = new File("resources\\de\\vetter\\masterthesis\\parameter\\parameters-examplefile.properties");
+		final ModelParameters modelParameters = new ModelParameters(new FileReader(parameterFile));
         
-        // TODO: preprocess: replace N? No, just throw a small error asking the user to provide a contig, not a scaffold.
         
+		/** Setting up the model */
+		
         GHMM ghmm = new GHMM();
-        ghmm.addState(new NoncodingState(NCS));
+        ghmm.addState(new NoncodingState(NCS, modelParameters));
         
         /** FORWARD STRAND */
-        ghmm.addState(new StartRegionState(FORWARD_START, true));
+        ghmm.addState(new StartRegionState(FORWARD_START, true, modelParameters));
         // ghmm.addState(new FixedSequenceState(FORWARD_START, "ATG")); // Name states + for forward, and - for backward strand
-        ghmm.addState(new CodingState(FORWARD_CDS, true));
-        ghmm.addState(new StopRegionState(FORWARD_STOP, true));
+        ghmm.addState(new CodingState(FORWARD_CDS, true, modelParameters));
+        ghmm.addState(new StopRegionState(FORWARD_STOP, true, modelParameters));
         
         /** simplest intron */
-        ghmm.addState(new IntronState(FORWARD_INTRON_0_0, true));
+        ghmm.addState(new IntronState(FORWARD_INTRON_0_0, true, modelParameters));
         
         /** intron preceded by one nt and followed by two nt of a codon */
         ghmm.addState(new ConstantLengthState(FORWARD_PREINTRON_ONE, 1) {
@@ -88,10 +96,10 @@ public class App
 				if(newEmission.length() != 1)
 					return Double.NEGATIVE_INFINITY;
 				
-				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 0);
+				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 0);
 			}
         });
-        ghmm.addState(new IntronState(FORWARD_INTRON_1_2, true));
+        ghmm.addState(new IntronState(FORWARD_INTRON_1_2, true, modelParameters));
         ghmm.addState(new ConstantLengthState(FORWARD_POSTINTRON_TWO, 2) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
@@ -99,8 +107,8 @@ public class App
 				if(newEmission.length() != 2)
 					return Double.NEGATIVE_INFINITY;
 				
-				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 1)
-						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
+				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 1)
+						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
 			}
         });
         
@@ -112,11 +120,11 @@ public class App
 				if(newEmission.length() != 2)
 					return Double.NEGATIVE_INFINITY;
 				
-				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 0)
-						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
+				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 0)
+						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
 			}
         });
-        ghmm.addState(new IntronState(FORWARD_INTRON_2_1, true));
+        ghmm.addState(new IntronState(FORWARD_INTRON_2_1, true, modelParameters));
         ghmm.addState(new ConstantLengthState(FORWARD_POSTINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
@@ -124,19 +132,19 @@ public class App
 				if(newEmission.length() != 1)
 					return Double.NEGATIVE_INFINITY;
 				
-				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 2);
+				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 2);
 			}
         });
         
         
         /** REVERSE STRAND */
-        ghmm.addState(new StartRegionState(REVERSE_START, false));
+        ghmm.addState(new StartRegionState(REVERSE_START, false, modelParameters));
         // ghmm.addState(new FixedSequenceState(REVERSE_START, "CAT")); // Name states + for forward, and - for backward strand
-        ghmm.addState(new CodingState(REVERSE_CDS, false));
-        ghmm.addState(new StopRegionState(REVERSE_STOP, false));
+        ghmm.addState(new CodingState(REVERSE_CDS, false, modelParameters));
+        ghmm.addState(new StopRegionState(REVERSE_STOP, false, modelParameters));
         
         /** simplest intron */
-        ghmm.addState(new IntronState(REVERSE_INTRON_0_0, false));
+        ghmm.addState(new IntronState(REVERSE_INTRON_0_0, false, modelParameters));
         
         /** intron preceded by one nt and followed by two nt of a codon */
         ghmm.addState(new ConstantLengthState(REVERSE_PREINTRON_ONE, 1) {
@@ -146,10 +154,10 @@ public class App
 				if(newEmission.length() != 1)
 					return Double.NEGATIVE_INFINITY;
 				
-				return Utilities.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 2);
+				return modelParameters.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 2);
 			}
         });
-        ghmm.addState(new IntronState(REVERSE_INTRON_1_2, false));
+        ghmm.addState(new IntronState(REVERSE_INTRON_1_2, false, modelParameters));
         ghmm.addState(new ConstantLengthState(REVERSE_POSTINTRON_TWO, 2) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
@@ -158,8 +166,8 @@ public class App
 					return Double.NEGATIVE_INFINITY;
 				
 				newEmission = Utilities.reverseComplement(newEmission);
-				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 0)
-						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
+				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 0)
+						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
 			}
         });
         
@@ -172,11 +180,11 @@ public class App
 					return Double.NEGATIVE_INFINITY;
 				
 				newEmission = Utilities.reverseComplement(newEmission);
-				return Utilities.getLogBaseProbabilityCDS(newEmission.charAt(0), 1)
-						+ Utilities.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
+				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 1)
+						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
 			}
         });
-        ghmm.addState(new IntronState(REVERSE_INTRON_2_1, false));
+        ghmm.addState(new IntronState(REVERSE_INTRON_2_1, false, modelParameters));
         ghmm.addState(new ConstantLengthState(REVERSE_POSTINTRON_ONE, 1) {
 			@Override
 			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
@@ -184,7 +192,7 @@ public class App
 				if(newEmission.length() != 1)
 					return Double.NEGATIVE_INFINITY;
 				
-				return Utilities.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 0);
+				return modelParameters.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 0);
 			}
         });        
         
@@ -198,7 +206,7 @@ public class App
         ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
         ghmm.setTransitionProbability(0, 2, 1d);
         
-        double probabilityStayNCS = 1695d/1700d;
+        double probabilityStayNCS = modelParameters.getProbabilityOfStayingInNCS(); //1695d/1700d;
         
         ghmm.setTransitionProbability(2, 2, probabilityStayNCS);
         ghmm.setTransitionProbability(2, 3, 0.4 * (1-probabilityStayNCS)); // NCS -> +M
@@ -207,15 +215,15 @@ public class App
         
         ghmm.setTransitionProbability(3, 4, 1d); // +M -> +CDS
         
-        double probabilityStayCDS     = 0.99995; // cf. QueryAnnotation.ipynb; still manually adapted
-        double probabilityCDSEnd      = (1d-probabilityStayCDS) * 0.62;
-        double probabilityCDSToIntron = (1d - probabilityStayCDS - probabilityCDSEnd) / 3d; // 0.000000000000001 is too big!
+        //double probabilityStayCDS     = ;
+        // double probabilityCDSEnd      = modelParameters.getProbabilityGeneEnds();
+        // double probabilityCDSToIntron = modelParameters.getProbabilityCDSToIntron();
         
-        ghmm.setTransitionProbability(4, 4, probabilityStayCDS); // stay in +CDS (exonlength median=960, mean=1250 -> approx 1200)
-        ghmm.setTransitionProbability(4, 5, probabilityCDSEnd); // +CDS -> +Stop: from introns / gene: geometric with 0 -> empirical p ~ 61%
-        ghmm.setTransitionProbability(4, 6, probabilityCDSToIntron); // +CDS -> +intron 0-0
-        ghmm.setTransitionProbability(4, 7, probabilityCDSToIntron); // +CDS -> + 1 nt before
-        ghmm.setTransitionProbability(4,10, probabilityCDSToIntron); // +CDS -> + 2 nts before
+        ghmm.setTransitionProbability(4, 4, modelParameters.getProbabilityOfStayingInCDS()); // stay in +CDS (exonlength median=960, mean=1250 -> approx 1200)
+        ghmm.setTransitionProbability(4, 5, modelParameters.getProbabilityGeneEnds()); // +CDS -> +Stop: from introns / gene: geometric with 0 -> empirical p ~ 61%
+        ghmm.setTransitionProbability(4, 6, modelParameters.getProbabilityCDSToIntron()); // +CDS -> +intron 0-0
+        ghmm.setTransitionProbability(4, 7, modelParameters.getProbabilityCDSToIntron()); // +CDS -> + 1 nt before
+        ghmm.setTransitionProbability(4,10, modelParameters.getProbabilityCDSToIntron()); // +CDS -> + 2 nts before
         
         ghmm.setTransitionProbability(5, 2, 1d); // +stop -> NCS always
         ghmm.setTransitionProbability(6, 4, 1d); // + intron 0-0 -> +CDS always
@@ -231,11 +239,11 @@ public class App
         // Reverse model:
         ghmm.setTransitionProbability(15, 14, 1d); // -Stop -> -CDS
         
-        ghmm.setTransitionProbability(14, 14, probabilityStayCDS); // stay in -CDS (see above)
-        ghmm.setTransitionProbability(14, 13, probabilityCDSEnd); // -CDS -> -M: from introns / gene: geometric with 0 -> empirical p ~ 61%
-        ghmm.setTransitionProbability(14, 16, probabilityCDSToIntron); // -CDS -> -intron 0-0
-        ghmm.setTransitionProbability(14, 17, probabilityCDSToIntron); // -CDS -> - 1 nt before (= to the left of) intron
-        ghmm.setTransitionProbability(14, 20, probabilityCDSToIntron); // -CDS -> - 2 nts before (= to the left of) intron
+        ghmm.setTransitionProbability(14, 14, modelParameters.getProbabilityOfStayingInCDS()); // stay in -CDS (see above)
+        ghmm.setTransitionProbability(14, 13, modelParameters.getProbabilityGeneEnds()); // -CDS -> -M: from introns / gene: geometric with 0 -> empirical p ~ 61%
+        ghmm.setTransitionProbability(14, 16, modelParameters.getProbabilityCDSToIntron()); // -CDS -> -intron 0-0
+        ghmm.setTransitionProbability(14, 17, modelParameters.getProbabilityCDSToIntron()); // -CDS -> - 1 nt before (= to the left of) intron
+        ghmm.setTransitionProbability(14, 20, modelParameters.getProbabilityCDSToIntron()); // -CDS -> - 2 nts before (= to the left of) intron
         
         ghmm.setTransitionProbability(13, 2, 1d); // -M -> NCS always
         
@@ -252,16 +260,13 @@ public class App
         
         System.out.println(ghmm);
         
-          
+        /** Write some book-keeping information into the output-file */
         writer.write("##gff-version 3");
         writer.newLine();
         writer.write("##Generated on: " + DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now));
         writer.newLine();
-        writer.write("##Source file: " + args[0]); writer.newLine();
-        writer.write("## Some probabilities: "); writer.newLine();
-        writer.write("## p(NCS->NCS)=" + probabilityStayNCS); writer.newLine();
-        writer.write("## p(CDS->CDS)=" + probabilityStayCDS); writer.newLine();
-        writer.write("## p(CDS->Stop)=" + probabilityCDSEnd); writer.newLine();
+        writer.write("##Source file: " + input.getAbsolutePath()); writer.newLine();
+        writer.write("##Parameter file: " + parameterFile.getAbsolutePath()); writer.newLine();
         
         
         /** Now read in the fasta file sequence for sequence, and for each sequence generate a gff-output */        
@@ -288,6 +293,8 @@ public class App
 		reader.close();
 		writer.flush();
 		writer.close();
+		
+		System.out.println("______________________\nWrote to output-file " + output.getAbsolutePath());
     }
     
     /**
@@ -296,10 +303,16 @@ public class App
      * @param writer
      * @param currentHeader
      * @param currentSequence
-     * @throws IOException 
+     * @throws IOException if something goes wrong while trying to write into the out-file 
+     * @throws IllegalArgumentException if the sequence contains N, not just TGAC
      */
     public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence) throws IOException {
-    	System.out.println("\nParses for " + currentHeader + ":\n");
+    	System.out.println("\nPrediction genes in " + currentHeader + ":\n");
+    	if(currentSequence.contains("NNN")) {
+			throw new IllegalArgumentException(
+					"The given sequence contained uncharacterised Nucleotides (N). Please provide contigs, not scaffolds");
+    	}
+    	
 		Viterbi viterbi = new Viterbi(ghmm, currentSequence);
 		viterbi.setAbbreviating(true);
 		for(List<Pair<HMMState, Integer>> parse : viterbi.computeParses()) {

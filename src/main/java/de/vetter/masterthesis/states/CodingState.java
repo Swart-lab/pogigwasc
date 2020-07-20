@@ -2,19 +2,18 @@ package de.vetter.masterthesis.states;
 
 import java.util.Iterator;
 
+import de.vetter.masterthesis.ModelParameters;
 import de.vetter.masterthesis.Utilities;
 
-public class CodingState extends HMMState {
-	private boolean strand;
+public class CodingState extends HMMStateWithStrandAndParameters {
 
 	/**
 	 * 
 	 * @param name
 	 * @param strand whether on forward strand
 	 */
-	public CodingState(String name, boolean strand) {
-		super(name);
-		this.strand = strand;
+	public CodingState(String name, boolean strand, ModelParameters parameters) {
+		super(name, strand, parameters);
 	}
 
 	@Override
@@ -22,12 +21,12 @@ public class CodingState extends HMMState {
 		if(newEmission.length() != 3)
 			return Double.NEGATIVE_INFINITY;
 		
-		if(!strand)
+		if(isReverse())
 			newEmission = Utilities.reverseComplement(newEmission);
 		
 		double result = 0;
 		for(int i = 0; i < 3; i++)
-			result += Utilities.getLogBaseProbabilityCDS(newEmission.charAt(i), i);
+			result += parameters.getLogBaseProbabilityCDS(newEmission.charAt(i), i);
 		
 		return result;
 	}

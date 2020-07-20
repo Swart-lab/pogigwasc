@@ -4,10 +4,21 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.vetter.masterthesis.states.FixedSequenceState;
 import de.vetter.masterthesis.states.InitialState;
 import de.vetter.masterthesis.states.IntronState;
 import de.vetter.masterthesis.states.TerminalState;
 
+/**
+ * 
+ * WARNING! {@link IntronState}s are being constructed with {@code null} for
+ * their ModelParameters. This is exactly sufficient <i>here</i>, but would
+ * cause problems (NullPointerExceptions) as soon as emission-probabilities were
+ * to be retrieved
+ * 
+ * @author David Emanuel Vetter
+ *
+ */
 public class TestGHMM {
 
 	@Test
@@ -29,8 +40,8 @@ public class TestGHMM {
 		
 		assertTrue(ghmm.checkTransitions());
 		
-		ghmm.addState(new IntronState("intron a", true));
-		ghmm.addState(new IntronState("intron b", true));
+		ghmm.addState(new IntronState("intron a", true, null));
+		ghmm.addState(new IntronState("intron b", true, null));
 		ghmm.initialiseTransitionMatrix();
 		
 		assertTrue(ghmm.checkTransitions());
@@ -48,7 +59,7 @@ public class TestGHMM {
 		ghmm.initialiseTransitionMatrix();
 		assertTrue(ghmm.isSetTransitionMatrix());
 		
-		ghmm.addState(new IntronState("intron b", true));
+		ghmm.addState(new IntronState("intron b", true, null));
 		assertFalse(ghmm.isSetTransitionMatrix());
 		
 		ghmm.initialiseTransitionMatrix();
@@ -61,7 +72,7 @@ public class TestGHMM {
 		ghmm.initialiseTransitionMatrix();
 		assertTrue(ghmm.checkTransitions());
 		
-		ghmm.addState(new IntronState("a", true));
+		ghmm.addState(new IntronState("a", true, null));
 		ghmm.initialiseTransitionMatrix();
 		
 		assertTrue(ghmm.checkTransitions());
@@ -76,7 +87,7 @@ public class TestGHMM {
 	@Test
 	public void testSetTransitionProbability() {
 		GHMM ghmm = new GHMM();
-		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron a", true, null));
 		
 		ghmm.initialiseTransitionMatrix();
 		assertEquals(0, Math.exp(ghmm.getLogTransitionProbability(1, 2)), 1e-9);
@@ -96,7 +107,7 @@ public class TestGHMM {
 	@Test
 	public void testNormaliseExitProbabilities() {
 		GHMM ghmm = new GHMM();
-		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron a", true, null));
 		ghmm.initialiseTransitionMatrix();
 		
 		ghmm.setTransitionProbability(2, 2, 7);
@@ -113,7 +124,7 @@ public class TestGHMM {
 	@Test
 	public void testNormaliseExitProbabilitiesAllZero() {
 		GHMM ghmm = new GHMM();
-		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron a", true, null));
 		ghmm.initialiseTransitionMatrix();
 		
 		ghmm.setTransitionProbability(2, 1, 0); // PROBABILITY!
@@ -128,12 +139,12 @@ public class TestGHMM {
 	@Test
 	public void testGetLogEmissionProbability() {
 		GHMM ghmm = new GHMM();
-		IntronState intron = new IntronState("intron a", true);
-		ghmm.addState(intron);
+		FixedSequenceState state = new FixedSequenceState("state", "a fixed sequence");
+		ghmm.addState(state);
 		ghmm.initialiseTransitionMatrix();
 		
-		assertEquals(intron.computeLogEmissionProbability(0, "GGGGG", "ATACCTTAAAAC"),
-				ghmm.getLogEmissionProbability(0, 2, "GGGGG", "ATACCTTAAAAC"), 1e-9);
+		assertEquals(0, ghmm.getLogEmissionProbability(0, 2, "GGGGG", "a fixed sequence"), 1e-9);
+		assertEquals(Double.NEGATIVE_INFINITY, ghmm.getLogEmissionProbability(0, 2, "GGGGG", "another fixed sequence"), 1e-9);
 	}
 
 	@Test
@@ -142,7 +153,7 @@ public class TestGHMM {
 		
 		assertEquals(2, ghmm.getNumberOfStates());
 		
-		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron a", true, null));
 		assertEquals(3, ghmm.getNumberOfStates());
 		assertTrue(ghmm.getState(2) instanceof IntronState);
 		
@@ -155,7 +166,7 @@ public class TestGHMM {
 		GHMM ghmm = new GHMM();
 		assertTrue(ghmm.getState(0) instanceof InitialState);
 		assertTrue(ghmm.getState(1) instanceof TerminalState);
-		ghmm.addState(new IntronState("intron a", true));
+		ghmm.addState(new IntronState("intron a", true, null));
 		assertTrue(ghmm.getState(2) instanceof IntronState);
 		assertEquals("intron a", ghmm.getState(2).getName());
 	}
@@ -175,8 +186,8 @@ public class TestGHMM {
 	@Test
 	public void testRemoveState() {
 		GHMM ghmm = new GHMM();
-		ghmm.addState(new IntronState("intron a", true));
-		ghmm.addState(new IntronState("intron b", true));
+		ghmm.addState(new IntronState("intron a", true, null));
+		ghmm.addState(new IntronState("intron b", true, null));
 		assertEquals("intron a", ghmm.getState(2).getName());
 		
 		ghmm.initialiseTransitionMatrix();
