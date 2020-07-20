@@ -1,5 +1,12 @@
 package de.vetter.masterthesis;
 
+/**
+ * Collection of some general methods with no particular place. This class implements the base-index-correspondence:
+ * TCAG<br>
+ * (i.e. T has index 0, C index 1 etc)
+ * 
+ * @author David Emanuel Vetter
+ */
 public class Utilities {
 
 	// Can be used for poisson -- but currently, i am no longer using poisson.

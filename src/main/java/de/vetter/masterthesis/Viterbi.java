@@ -6,7 +6,9 @@ import java.util.List;
 import de.vetter.masterthesis.states.HMMState;
 
 /**
- * Implements the viterbi algorithm as described by Stanke (AUGUSTUS)
+ * Implements the viterbi algorithm as described by Stanke (AUGUSTUS): Construct
+ * a Viterbi-instance for a GHMM and a given sequence, to compute the
+ * viterbi-variables of that model on that sequence, and yield the MAP-parses
  * 
  * @author David Emanuel Vetter
  *
@@ -93,6 +95,10 @@ public class Viterbi {
 		System.out.println("Computed variables!");
 	}
 	
+	/**
+	 * Computes all most likely parses (and reports progress in System.out)
+	 * @return A List of Parses (where each parse is a list of pairs of a state and the emission-length from that state)
+	 */
 	public List<List<Pair<HMMState, Integer>>> computeParses() {
 		computeViterbiVariables();
 		ArrayList<ViterbiSeed> workLoad = new ArrayList<ViterbiSeed>();
@@ -103,6 +109,7 @@ public class Viterbi {
 			double candidate = viterbiVariables[q1][sequence.length()] + model.getLogTransitionProbability(q1, 1);
 			if(initialMax <= candidate) {
 				if(initialMax < candidate) {
+					// TODO: is hard exact maximum sensible, or should there be a little double-tolerance?
 					initialMax = candidate;
 					workLoad.clear();
 				}
@@ -124,6 +131,7 @@ public class Viterbi {
 			}
 		}
 		
+		// This corresponds to the finalisation described by Stanke on page 15.
 		ArrayList<List<Pair<HMMState, Integer>>> parses = new ArrayList<List<Pair<HMMState, Integer>>>();
 		for(ViterbiSeed startSeed : finished) {
 			ArrayList<Pair<HMMState, Integer>> parse = new ArrayList<Pair<HMMState, Integer>>();

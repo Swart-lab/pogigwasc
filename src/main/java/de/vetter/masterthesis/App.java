@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -36,6 +38,7 @@ import de.vetter.masterthesis.states.*;
  * TODO: does this parameter-file handling still work if in a jar?
  */
 public class App {
+	/** State-names: Name states +... for forward strand, and -... for reverse strand */
 	private static final String NCS = "NCS";
 	private static final String FORWARD_START = "+M";
 	private static final String FORWARD_CDS = "+CDS";
@@ -62,27 +65,39 @@ public class App {
 	public static void main(String[] args) throws IOException, ParseException {
 		LocalDateTime now = LocalDateTime.now();
 
+		/** Setting up command-line options */
 		Options commandLineOptions = new Options();
+		Option help = new Option("h", "help", false, "(print this message)");
+		commandLineOptions.addOption(help);
+		
 		Option in = new Option("i", "input", true,
 				"the fasta-input-file whereon to perform gene-prediction. Supply contigs, "
 						+ "not scaffolds (no unspecified nucleotides (N) allowed)");
-		in.setRequired(true);
 		commandLineOptions.addOption(in);
+		
+		OptionGroup helpGroup = new OptionGroup();
+		helpGroup.addOption(help);
+		helpGroup.addOption(in);
 
 		Option out = new Option("o", "output", true,
 				"the output-file, will be in GFF3-format; if this is not specified, a .gff-file"
 						+ " with a name derived from the given input-file (but also including"
 						+ " information about date and time for bookkeeping) will be created "
 						+ "in the same directory as the in-file");
-		out.setRequired(false);
 		commandLineOptions.addOption(out);
 		
 		Option param = new Option("p", "parameters", true, "parameter-file in java's properties-format");
-		param.setRequired(false);
 		commandLineOptions.addOption(param);
 		
-		CommandLine cmd = new DefaultParser().parse(commandLineOptions, args);
+		CommandLine cmd = new DefaultParser().parse(commandLineOptions, args, true);
+		
+		/** Generally nice behaviour: if one simply runs the program without sufficient parameters: provide help */
+		if(cmd.hasOption('h') || !cmd.hasOption('i')) {
+			new HelpFormatter().printHelp("... -i infile.fasta [-o outfile] [-p parameterfile.properties]", commandLineOptions);
+			return;
+		}
 
+		
 		/** File management */
 
 		File input = new File(cmd.getOptionValue('i'));
@@ -113,15 +128,17 @@ public class App {
 		 
 		final ModelParameters modelParameters = new ModelParameters(new FileReader(parameterFile));
 
-		/** Setting up the model */
+		
+		
+		/** 
+		 * Setting up the model 
+		 */
 
 		GHMM ghmm = new GHMM();
 		ghmm.addState(new NoncodingState(NCS, modelParameters));
 
 		/** FORWARD STRAND */
-		ghmm.addState(new StartRegionState(FORWARD_START, true, modelParameters));
-		// ghmm.addState(new FixedSequenceState(FORWARD_START, "ATG")); // Name states +
-		// for forward, and - for backward strand
+		ghmm.addState(new StartRegionState(FORWARD_START, true, modelParameters)); 
 		ghmm.addState(new CodingState(FORWARD_CDS, true, modelParameters));
 		ghmm.addState(new StopRegionState(FORWARD_STOP, true, modelParameters));
 
@@ -178,8 +195,6 @@ public class App {
 
 		/** REVERSE STRAND */
 		ghmm.addState(new StartRegionState(REVERSE_START, false, modelParameters));
-		// ghmm.addState(new FixedSequenceState(REVERSE_START, "CAT")); // Name states +
-		// for forward, and - for backward strand
 		ghmm.addState(new CodingState(REVERSE_CDS, false, modelParameters));
 		ghmm.addState(new StopRegionState(REVERSE_STOP, false, modelParameters));
 
@@ -243,7 +258,7 @@ public class App {
 		ghmm.setTransitionProbability(1, 1, 1d); // stay in terminal
 		ghmm.setTransitionProbability(0, 2, 1d);
 
-		double probabilityStayNCS = modelParameters.getProbabilityOfStayingInNCS(); // 1695d/1700d;
+		double probabilityStayNCS = modelParameters.getProbabilityOfStayingInNCS();
 
 		ghmm.setTransitionProbability(2, 2, probabilityStayNCS);
 		ghmm.setTransitionProbability(2, 3, 0.4 * (1 - probabilityStayNCS)); // NCS -> +M
@@ -252,16 +267,8 @@ public class App {
 
 		ghmm.setTransitionProbability(3, 4, 1d); // +M -> +CDS
 
-		// double probabilityStayCDS = ;
-		// double probabilityCDSEnd = modelParameters.getProbabilityGeneEnds();
-		// double probabilityCDSToIntron = modelParameters.getProbabilityCDSToIntron();
-
-		ghmm.setTransitionProbability(4, 4, modelParameters.getProbabilityOfStayingInCDS()); // stay in +CDS (exonlength
-																								// median=960, mean=1250
-																								// -> approx 1200)
-		ghmm.setTransitionProbability(4, 5, modelParameters.getProbabilityGeneEnds()); // +CDS -> +Stop: from introns /
-																						// gene: geometric with 0 ->
-																						// empirical p ~ 61%
+		ghmm.setTransitionProbability(4, 4, modelParameters.getProbabilityOfStayingInCDS()); // +CDS -> +CDS
+		ghmm.setTransitionProbability(4, 5, modelParameters.getProbabilityGeneEnds()); // +CDS -> +Stop
 		ghmm.setTransitionProbability(4, 6, modelParameters.getProbabilityCDSToIntron()); // +CDS -> +intron 0-0
 		ghmm.setTransitionProbability(4, 7, modelParameters.getProbabilityCDSToIntron()); // +CDS -> + 1 nt before
 		ghmm.setTransitionProbability(4, 10, modelParameters.getProbabilityCDSToIntron()); // +CDS -> + 2 nts before
@@ -280,11 +287,8 @@ public class App {
 		// Reverse model:
 		ghmm.setTransitionProbability(15, 14, 1d); // -Stop -> -CDS
 
-		ghmm.setTransitionProbability(14, 14, modelParameters.getProbabilityOfStayingInCDS()); // stay in -CDS (see
-																								// above)
-		ghmm.setTransitionProbability(14, 13, modelParameters.getProbabilityGeneEnds()); // -CDS -> -M: from introns /
-																							// gene: geometric with 0 ->
-																							// empirical p ~ 61%
+		ghmm.setTransitionProbability(14, 14, modelParameters.getProbabilityOfStayingInCDS()); // stay in -CDS
+		ghmm.setTransitionProbability(14, 13, modelParameters.getProbabilityGeneEnds()); // -CDS -> -M
 		ghmm.setTransitionProbability(14, 16, modelParameters.getProbabilityCDSToIntron()); // -CDS -> -intron 0-0
 		ghmm.setTransitionProbability(14, 17, modelParameters.getProbabilityCDSToIntron()); // -CDS -> - 1 nt before (=
 																							// to the left of) intron
@@ -360,6 +364,7 @@ public class App {
 	 */
 	public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence)
 			throws IOException {
+		
 		System.out.println("\nPrediction genes in " + currentHeader + ":\n");
 		if (currentSequence.contains("NNN")) {
 			throw new IllegalArgumentException(
@@ -434,7 +439,7 @@ public class App {
 					writer.newLine();
 					currentFeature = null; // NCS follows
 					startOfCurrentFeature = currentPos + 24; // not strictly necessary, following NCS will take care of
-																// this.
+																// this. Also: Magic literal -> ModelParameters TODO
 					break;
 				case REVERSE_START:
 					// Komme von CDS! -M zählt mit in die CDS.

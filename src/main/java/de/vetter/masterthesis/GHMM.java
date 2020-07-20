@@ -9,15 +9,15 @@ import de.vetter.masterthesis.states.TerminalState;
 
 /**
  * Implements a generalized Hidden Markov Model, which always has an initial
- * state (index 0) and a terminal state (index 1).
+ * state (index 0) and a terminal state (index 1).<br>
  * 
- * Usage: Construct, then add all desired states via
+ * <b>Usage:</b> Construct, then add all desired states via
  * {@link #addState(HMMState)}, then call {@link #initialiseTransitionMatrix()}
  * and implement the transition-probabilities via calls of
  * {@link #setTransitionProbability(int, int, double)}, and potentially
- * normalise the matrix via {{@link #normaliseExitProbabilities(int)}. Finally,
+ * normalise the matrix via {@link #normaliseExitProbabilities(int)}. Finally,
  * you might want to check the validity of the matrix via
- * {{@link #checkTransitions()}
+ * {@link #checkTransitions()}
  * 
  * @author David Emanuel Vetter
  */
@@ -99,10 +99,10 @@ public class GHMM {
 	}
 	
 	/**
-	 * Sets the probability (!, not log probability) of transitioning from->to. Can
+	 * Sets the probability (!, <b>not log probability</b>) of transitioning from->to. Can
 	 * instead give weights here and then normalise via
-	 * {@link #normaliseExitProbabilities(int)}. Call
-	 * {@link initialiseTransitionMatrix} before calling this.
+	 * {@link #normaliseExitProbabilities(int)}. <br>
+	 * Call {@link initialiseTransitionMatrix} before calling this.
 	 * 
 	 * 
 	 * @param from
