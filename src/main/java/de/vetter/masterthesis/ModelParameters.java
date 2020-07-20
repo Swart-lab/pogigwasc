@@ -113,9 +113,10 @@ public class ModelParameters {
 			stopCorrections = stopCorrections.substring(1, stopCorrections.length() - 1); // remove {}-frame
 			for (String c : stopCorrections.split(",")) {
 				String[] pair = c.split(":");
-				if (pair.length != 2) {
-					throw new IOException("explicit_codon_probabilities_stop_region is malformatted: " + c
-							+ " cannot be analysed as a CODON:Probability-pair");
+				if (!c.contains(":") || pair.length != 2) {
+					problemDetails = " or malformatted: '" + c
+							+ "' cannot be analysed as a CODON:Probability-pair";
+					throw new IOException(); // this will be caught by the catch just below.
 				}
 				stopRegionExplicitCodons.put(pair[0].replaceAll("\\s+", ""), Double.parseDouble(pair[1]));
 			}

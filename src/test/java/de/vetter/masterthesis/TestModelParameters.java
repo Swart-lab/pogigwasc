@@ -3,6 +3,7 @@ package de.vetter.masterthesis;
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -20,6 +21,32 @@ public class TestModelParameters {
 		FileReader reader = new FileReader(
 				new File("resources//de//vetter//masterthesis//parameter//parameters-examplefile.properties"));
 		mp = new ModelParameters(reader);
+	}
+	
+	@Test
+	public void testInvalidParameterFile() throws FileNotFoundException {
+		FileReader reader = new FileReader(
+				new File("resources//de//vetter//masterthesis//parameter//parameters-invalid.properties"));
+		
+		try {
+			mp = new ModelParameters(reader);
+		} catch (IOException e) {
+			assertTrue(e.getMessage().contains("base_frequencies_NCS"));
+		}
+	}
+	
+	@Test
+	public void testInvalidCodonCorrection() throws FileNotFoundException {
+		FileReader reader = new FileReader(
+				new File("resources//de//vetter//masterthesis//parameter//parameters-invalid-codon-correction.properties"));
+		
+		try {
+			mp = new ModelParameters(reader);
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			assertTrue(e.getMessage().contains("explicit_codon_probabilities_stop_region"));
+			assertTrue(e.getMessage().contains("MESS"));
+		}
 	}
 	
 	@Test
