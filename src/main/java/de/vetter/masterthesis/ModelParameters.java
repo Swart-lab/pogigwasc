@@ -45,8 +45,6 @@ public class ModelParameters {
 		Properties properties = new Properties();
 		properties.load(parameterFileReader);
 		
-		properties.list(System.out);
-		
 		// These two are used to give somewhat informative problem-reports to the user (see the catch-response below)
 		String currentParameter = "";
 		String problemDetails = "";
@@ -119,7 +117,7 @@ public class ModelParameters {
 					throw new IOException("explicit_codon_probabilities_stop_region is malformatted: " + c
 							+ " cannot be analysed as a CODON:Probability-pair");
 				}
-				stopRegionExplicitCodons.put(pair[0], Double.parseDouble(pair[1]));
+				stopRegionExplicitCodons.put(pair[0].replaceAll("\\s+", ""), Double.parseDouble(pair[1]));
 			}
 		} catch (Exception e) {
 			throw new IOException(currentParameter + " is missing" + problemDetails);
@@ -258,7 +256,15 @@ public class ModelParameters {
 		return Math.log(baseMarginalsCDS[positionInCodon][Utilities.baseToIndex(base)]);
 	}
 	
+	/**
+	 * @param codon a string of length 3 
+	 * @return log probability of seeing this codon in the stop region
+	 * @throws IllegalArgumentException if the codon has a length other than 3
+	 */
 	public double getLogCodonProbabilityStopRegion(String codon) {
+		if(codon.length() != 3) 
+			throw new IllegalArgumentException("Given codon '" + codon + "' is not of length 3");
+		
 		double result = 0d;
 		// Special cases: Determined from StopRegions.ipynb and prior: UGA, UAA are
 		// depleted, use AAG and AAA for correcting this in the distribution

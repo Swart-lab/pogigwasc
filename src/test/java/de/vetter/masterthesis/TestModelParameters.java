@@ -112,63 +112,134 @@ public class TestModelParameters {
 		assertEquals(Double.NEGATIVE_INFINITY, mp.getLogProbabilityIntronLength(31), TOLERANCE);
 		assertTrue(Double.NEGATIVE_INFINITY < mp.getLogProbabilityIntronLength(12));
 		assertTrue(Double.NEGATIVE_INFINITY < mp.getLogProbabilityIntronLength(30));
-		assertEquals(mp.getLogProbabilityIntronLength(17), 0.55*mp.getLogProbabilityIntronLength(18), TOLERANCE);
+		assertEquals(Math.log(0.55) + mp.getLogProbabilityIntronLength(17), mp.getLogProbabilityIntronLength(18), TOLERANCE);
 		// TODO: might actually check the entire distribution
 	}
 
 	@Test
 	public void testGetLogBaseProbabilityCDS() {
-		fail("Not yet implemented");
+		assertEquals(0.24, Math.exp(mp.getLogBaseProbabilityCDS('T', 0)), TOLERANCE);
+		assertEquals(0.13, Math.exp(mp.getLogBaseProbabilityCDS('C', 0)), TOLERANCE);
+		assertEquals(0.31, Math.exp(mp.getLogBaseProbabilityCDS('A', 0)), TOLERANCE);
+		assertEquals(0.32, Math.exp(mp.getLogBaseProbabilityCDS('G', 0)), TOLERANCE);
+		
+		assertEquals(0.30, Math.exp(mp.getLogBaseProbabilityCDS('T', 1)), TOLERANCE);
+		assertEquals(0.18, Math.exp(mp.getLogBaseProbabilityCDS('C', 1)), TOLERANCE);
+		assertEquals(0.37, Math.exp(mp.getLogBaseProbabilityCDS('A', 1)), TOLERANCE);
+		assertEquals(0.15, Math.exp(mp.getLogBaseProbabilityCDS('G', 1)), TOLERANCE);
+		
+		assertEquals(0.36, Math.exp(mp.getLogBaseProbabilityCDS('T', 2)), TOLERANCE);
+		assertEquals(0.12, Math.exp(mp.getLogBaseProbabilityCDS('C', 2)), TOLERANCE);
+		assertEquals(0.38, Math.exp(mp.getLogBaseProbabilityCDS('A', 2)), TOLERANCE);
+		assertEquals(0.14, Math.exp(mp.getLogBaseProbabilityCDS('G', 2)), TOLERANCE);
+	}
+	
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void testGetLogBaseProbabilityCDSOutOfCodon() {
+		assertEquals(0.30, Math.exp(mp.getLogBaseProbabilityCDS('T', 3)), TOLERANCE);
+	}
+	
+	@Test(expected = IndexOutOfBoundsException.class)
+	public void testGetLogBaseProbabilityCDSNotABase() {
+		assertEquals(0.30, Math.exp(mp.getLogBaseProbabilityCDS('-', 1)), TOLERANCE);
 	}
 
 	@Test
 	public void testGetLogCodonProbabilityStopRegion() {
-		fail("Not yet implemented");
+		// check the four specified codons:
+		assertEquals(0, Math.exp(mp.getLogCodonProbabilityStopRegion("TGA")), TOLERANCE);
+		assertEquals(0.0018, Math.exp(mp.getLogCodonProbabilityStopRegion("TAA")), TOLERANCE);
+		assertEquals(0.047, Math.exp(mp.getLogCodonProbabilityStopRegion("AAG")), TOLERANCE);
+		assertEquals(0.060088, Math.exp(mp.getLogCodonProbabilityStopRegion("AAA")), TOLERANCE);
+		
+		// Check SOME other codons:
+		assertEquals(0.14*0.36*0.14, Math.exp(mp.getLogCodonProbabilityStopRegion("CAG")), TOLERANCE);
+		assertEquals(0.355*0.16*0.12, Math.exp(mp.getLogCodonProbabilityStopRegion("ACC")), TOLERANCE);
+		assertEquals(0.24*0.32*0.36, Math.exp(mp.getLogCodonProbabilityStopRegion("TTT")), TOLERANCE);
+		assertEquals(0.265*0.16*0.14, Math.exp(mp.getLogCodonProbabilityStopRegion("GCG")), TOLERANCE);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetLogCodonProbabilityStopRegionCodonTooLong() {
+		assertEquals(0, Math.exp(mp.getLogCodonProbabilityStopRegion("GAATTC")), TOLERANCE);
+	}
+	
+	@Test(expected = IllegalArgumentException.class)
+	public void testGetLogCodonProbabilityStopRegionCodonTooShort() {
+		assertEquals(0, Math.exp(mp.getLogCodonProbabilityStopRegion("GT")), TOLERANCE);
 	}
 
 	@Test
 	public void testGetLogBaseProbabilityNCS() {
-		fail("Not yet implemented");
+		double[] baseFrequencies = {0.46, 0.10, 0.355, 0.085};
+		String bases = "TCAG";
+		for(int i = 0; i < 4; i++) {
+			assertEquals(baseFrequencies[i], Math.exp(mp.getLogBaseProbabilityNCS(bases.charAt(i))), TOLERANCE);	
+		}
 	}
 
 	@Test
 	public void testGetLogBaseProbabilityIntron() {
-		fail("Not yet implemented");
+		double[] baseFrequencies = {0.46, 0.10, 0.355, 0.085};
+		String bases = "TCAG";
+		for(int i = 0; i < 4; i++) {
+			assertEquals(baseFrequencies[i], Math.exp(mp.getLogBaseProbabilityIntron(bases.charAt(i))), TOLERANCE);	
+		}
 	}
 
 	@Test
 	public void testGetLogBaseProbabilityStartRegion() {
-		fail("Not yet implemented");
+		double[] baseFrequencies = {0.15, 0.02, 0.78, 0.05};
+		String bases = "TCAG";
+		for(int i = 0; i < 4; i++) {
+			assertEquals(baseFrequencies[i], Math.exp(mp.getLogBaseProbabilityStartRegion(bases.charAt(i))), TOLERANCE);
+		}
 	}
 
 	@Test
 	public void testGetLogBaseProbabilitySDS() {
-		fail("Not yet implemented");
+		double[][] baseFrequencies = { { 0, 0, 0, 1 }, { 1, 0, 0, 0 }, { 0.02, 0.02, 0.94, 0.02 },
+				{ 0.02, 0.02, 0.94, 0.02 }, { 0.35, 0.05, 0.15, 0.45 } };
+		String bases = "TCAG";
+		for (int pos = 0; pos < 5; pos++) {
+			for (int i = 0; i < 4; i++) {
+				assertEquals(baseFrequencies[pos][i], Math.exp(mp.getLogBaseProbabilitySDS(bases.charAt(i), pos)),
+						TOLERANCE);
+			}
+		}
 	}
 
 	@Test
 	public void testGetLogBaseProbabilitySAS() {
-		fail("Not yet implemented");
+		double[][] baseFrequencies = { { 0.45, 0.05, 0.35, 0.15 }, { 0.65, 0.25, 0.05, 0.05 }, { 0, 0, 1, 0 },
+				{ 0, 0, 0, 1 } };
+		String bases = "TCAG";
+		for (int pos = 0; pos < 4; pos++) {
+			for (int i = 0; i < 4; i++) {
+				assertEquals(baseFrequencies[pos][i], Math.exp(mp.getLogBaseProbabilitySAS(bases.charAt(i), pos)),
+						TOLERANCE);
+			}
+		}
 	}
 
 	@Test
 	public void testGetMaxIntronSize() {
-		fail("Not yet implemented");
+		assertEquals(30, mp.getMaxIntronSize());
 	}
 
 	@Test
 	public void testGetMinIntronSize() {
-		fail("Not yet implemented");
+		assertEquals(12, mp.getMinIntronSize());
 	}
 
 	@Test
 	public void testGetSDSSize() {
-		fail("Not yet implemented");
+		assertEquals(5, mp.getSDSSize());
 	}
 
 	@Test
 	public void testGetSASSize() {
-		fail("Not yet implemented");
+		assertEquals(4, mp.getSASSize());
 	}
 
 }
