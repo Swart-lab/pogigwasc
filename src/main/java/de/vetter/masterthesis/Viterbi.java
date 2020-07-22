@@ -34,13 +34,21 @@ public class Viterbi {
 		this.sequence = sequence;
 	}
 	
+	/**
+	 * This determines whether the emission history is constructed and handed to the
+	 * states when computing the emission probabilities -- this is often not needed,
+	 * in particular, i do not make use of the emission history here (so far)
+	 * 
+	 * @param abbreviate whether to omit the emission history (make sure the model
+	 *                   does not need it!)
+	 */
 	public void setAbbreviating(boolean abbreviate) {
 		this.abbreviating = abbreviate;
 	}
 	
 	/**
-	 * 
-	 * @return whether this viterbi-instance is abbreviating the emission-probability-computation by omitting the emission-history
+	 * @return whether this viterbi-instance is abbreviating the
+	 *         emission-probability-computation by omitting the emission-history
 	 */
 	public boolean isAbbreviating() {
 		return abbreviating;
@@ -104,6 +112,7 @@ public class Viterbi {
 		ArrayList<ViterbiSeed> workLoad = new ArrayList<ViterbiSeed>();
 		ArrayList<ViterbiSeed> finished = new ArrayList<ViterbiSeed>(); // here put all seeds that reach l=0
 		
+		// Initialisation
 		double initialMax = Double.NEGATIVE_INFINITY;
 		for(int q1 = 2; q1 < model.getNumberOfStates(); q1++) {
 			double candidate = viterbiVariables[q1][sequence.length()] + model.getLogTransitionProbability(q1, 1);
@@ -117,6 +126,7 @@ public class Viterbi {
 			}
 		}
 		
+		// 'Recursion': working through the viterbi-variable-matrix
 		while(!workLoad.isEmpty()) {
 			ViterbiSeed current = workLoad.remove(0);
 			List<ViterbiSeed> stepped = current.step(viterbiVariables);

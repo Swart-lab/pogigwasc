@@ -59,7 +59,7 @@ public class GHMM {
 	}
 	
 	/**
-	 * Sets ALL entries to -infty (i.e. probability 0).
+	 * Sets <b>ALL</b> entries to -infty (i.e. probability 0).<br>
 	 * Use carefully!
 	 */
 	public void clearTransitionMatrix() {
@@ -114,8 +114,11 @@ public class GHMM {
 	}
 	
 	/**
-	 * Normalises the given column of the probability matrix, unless all entries are -Infty. in that case turns the state into simple forward.
-	 * @param state
+	 * Normalises the given column of the probability matrix, unless all entries are
+	 * -Infty. In that case turns the state into simple forward (i.e. always exits
+	 * to state with next-higher index; or terminal).
+	 * 
+	 * @param state whose exit-probabilities are to be normalised
 	 */
 	public void normaliseExitProbabilities(int state) {
 		double normaliser = 0;

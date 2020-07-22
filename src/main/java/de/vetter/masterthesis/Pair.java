@@ -4,8 +4,8 @@ package de.vetter.masterthesis;
  * Trivial pair class
  * @author David Emanuel Vetter
  *
- * @param <T1>
- * @param <T2>
+ * @param <T1> class of the pair's first part
+ * @param <T2> class of the pair's second part
  */
 public class Pair<T1, T2> {
 	private T1 first;

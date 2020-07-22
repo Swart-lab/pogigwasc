@@ -44,6 +44,11 @@ public class Utilities {
 		}
 	}
 	
+	/**
+	 * @param sequence (preferably <i>not</i> containing N
+	 * @return reverse complement of that sequence -- if some other base than the
+	 *         standard TCAG is found in the sequence, its complement is will be N.
+	 */
 	public static String reverseComplement(String sequence) {
 		StringBuffer result = new StringBuffer();
 		for(char b : sequence.toCharArray()) {
@@ -72,7 +77,10 @@ public class Utilities {
 		return result.reverse().toString();
 	}
 	
-	
+	/**
+	 * @param k
+	 * @return ln(k!)
+	 */
 	public static double logFactorial(int k) {
 		if(k < LOG_FACTORIALS.length) {
 			return LOG_FACTORIALS[k];

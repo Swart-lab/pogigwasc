@@ -340,7 +340,7 @@ public class App {
 
 		// on last sequence
 		if (currentHeader != null) {
-			doPredictions(ghmm, writer, currentHeader, currentSequence); // .substring(45700, 48500));
+			doPredictions(ghmm, writer, currentHeader, currentSequence);
 		}
 
 		reader.close();
@@ -442,7 +442,7 @@ public class App {
 																// this. Also: Magic literal -> ModelParameters TODO
 					break;
 				case REVERSE_START:
-					// Komme von CDS! -M zählt mit in die CDS.
+					// Coming from CDS: -M is to be counted into the CDS
 					writer.write(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
 							+ startOfCurrentFeature + "\t" + (currentPos + 2) + "\t.\t-\t.\t ");
 					writer.newLine();

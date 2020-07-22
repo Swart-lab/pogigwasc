@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Class for traceback/parse-retrieval
+ * Class for traceback/parse-retrieval: Key-method is {@link #step(double[][])},
+ * which will 'spawn' a number (at least 1) of Viterbi-Seeds that have regressed
+ * backwards into the sequence: To compute the viterbi-parses, step the initial
+ * seeds through the matrix, until they reach the start of the sequence
  * 
  * @author David Emanuel Vetter
  */

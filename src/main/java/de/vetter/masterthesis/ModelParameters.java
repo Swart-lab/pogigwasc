@@ -128,10 +128,18 @@ public class ModelParameters {
 	}
 	
 	/**
-	 * @param encoded
-	 * @param rowLength
-	 * @return
-	 * @throws IllegalArgumentException
+	 * Decodes a matrix encoded as a string of the following format:
+	 * <ul>
+	 * <li>a pair of curly brackets surrounds the entire matrix</li>
+	 * <li>the rows of the matrix are only separated by optional whitespaces, <b>not</b> by commata</li>
+	 * <li>each row begins with {, ends with }, and has a comma-separated list of numbers in it</li>
+	 * <li>all rows have the same length</li>
+	 * <ul>
+	 * 
+	 * @param encoded the string encoding of a matrix
+	 * @param rowLength the length of all the rows
+	 * @return a double-array containing all the entries of the matrix at the correct positions
+	 * @throws IllegalArgumentException if not all the rows have the correct length
 	 */
 	public static double[][] parseMatrix(String encoded, int rowLength) throws IllegalArgumentException {
 		double[][] result;
@@ -147,11 +155,15 @@ public class ModelParameters {
 	}
 	
 	/**
-	 * Helper method to parse a String of the form {d+.d*, d+.d*, d+.d*, d+.d*} into a double-array
-	 * @param encoded
-	 * @param demandedLength
-	 * @return
-	 * @throws IllegalArgumentException 
+	 * Helper method to parse a String into a double-array. The string has to be
+	 * correctly formatted, by containing exactly one comma-separated list of the
+	 * given number of decimal-numbers, framed altogether by curly brackets
+	 * 
+	 * @param encoded        the encoding of the vector
+	 * @param demandedLength the length of the vector
+	 * @return the decoded vector
+	 * @throws IllegalArgumentException if the vector does not have the specified
+	 *                                  length
 	 */
 	 public static double[] parseRowVector(String encoded, int demandedLength) throws IllegalArgumentException {
 		double[] result = null;
@@ -180,14 +192,24 @@ public class ModelParameters {
 	
 	
 	// All the getters for the states/dependents to call and access the parameter-values
+	
+	/**
+	 * @return transition probability NCS -> NCS
+	 */
 	public double getProbabilityOfStayingInNCS() {
 		return transitionNCS2NCS;
 	}
 	
+	/**
+	 * @return transition probability CDS -> CDS
+	 */
 	public double getProbabilityOfStayingInCDS() {
 		return transitionCDS2CDS;
 	}
 	
+	/**
+	 * @return Transition probability CDS -> +stop/-start
+	 */
 	public double getProbabilityGeneEnds() {
 		return (1-transitionCDS2CDS) * transitionCDS2StopGivenLeavingCDS;
 	}
@@ -200,10 +222,18 @@ public class ModelParameters {
 		return (1 - transitionCDS2CDS - getProbabilityGeneEnds()) / 3d;
 	}
 	
+	/**
+	 * @return size of the start-region in nt; the start-codon here is always the
+	 *         last 3 bases of this start-region
+	 */
 	public int getStartRegionSize() {
 		return startregionSize;
 	}
 	
+	/**
+	 * @return size of the stop-region in nt; the stop-codon here is always the last
+	 *         3 bases of this stop-region
+	 */
 	public int getStopRegionSize() {
 		return stopregionSize;
 	}
@@ -222,6 +252,7 @@ public class ModelParameters {
 		
 		intronLogA = -Math.log(intronLogA);
 		
+		// For plotting in latex:
 		/*
 		 * private double[] LENGTH_PROBABILITIES =
 		 * new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -253,6 +284,18 @@ public class ModelParameters {
 		return result;
 	}
 	
+	/**
+	 * Probability of seeing given base at given position (0,1,2) in a codon in a
+	 * CDS. <br>
+	 * <b>Modelling Assumption/Approximation:</b> the bases in a codon are
+	 * independent random variables<br>
+	 * They are in fact not, but this is used to avoid overfitting to the empirical
+	 * codon-distribution.
+	 * 
+	 * @param base one of: 'T', 'C', 'A', 'G'
+	 * @param positionInCodon 0 (first base), 1, 2 (last base)
+	 * @return <b>log</b> probability of seeing this base at that position
+	 */
 	public double getLogBaseProbabilityCDS(char base, int positionInCodon) {
 		return Math.log(baseMarginalsCDS[positionInCodon][Utilities.baseToIndex(base)]);
 	}
@@ -283,52 +326,83 @@ public class ModelParameters {
 		return result;
 	}
 	
+	/**
+	 * @param base any of 'T', 'C', 'A', 'G'
+	 * @return <b>log</b> probability of seeing that base in the NCS
+	 */
 	public double getLogBaseProbabilityNCS(char base) {
 		return Math.log(baseProbabilitiesNCS[Utilities.baseToIndex(base)]);
 	}
 	
+	/**
+	 * @param base any of 'T', 'C', 'A', 'G'
+	 * @return <b>log</b> probability of seeing that base in the middle part of an
+	 *         intron (outside the SAS and SDS)
+	 */
 	public double getLogBaseProbabilityIntron(char base) {
 		return Math.log(baseProbabilitiesIntron[Utilities.baseToIndex(base)]);
 	}
 	
+	/**
+	 * @param base any of 'T', 'C', 'A', 'G'
+	 * @return <b>log</b> probability of seeing that base in the start-region
+	 *         upstream of the start-AUG. Because of the particular
+	 *         Kozak-Consensus-sequence (AAA<u>ATG</u>) found in ciliates (Loxodes in particular),
+	 *         one categorical distribuiton suffices for the three bases upstream of
+	 *         the start-AUG
+	 */
 	public double getLogBaseProbabilityStartRegion(char base) {
 		return Math.log(baseProbabilitiesStartregion[Utilities.baseToIndex(base)]);
 	}
 	
 	/**
-	 * 
-	 * @param base
-	 * @param i index within SDS
-	 * @return log probability of seeing base at index i in the SDS
+	 * @param base any of 'T', 'C', 'A', 'G'
+	 * @param i    index within SDS
+	 * @return <b>log</b> probability of seeing base at index i in the SDS (splice
+	 *         donor-site)
 	 */
 	public double getLogBaseProbabilitySDS(char base, int i) {
 		return Math.log(baseProbabilitiesSDS[i][Utilities.baseToIndex(base)]);
 	}
 	
 	/**
-	 * 
-	 * @param base
+	 * @param base any of 'T', 'C', 'A', 'G'
 	 * @param i    index within SAS -- not within the intron; transform index w.r.t.
 	 *             intron-start into SAS-index by: index - (intron_length -
 	 *             sas_size)
-	 * @return log probability of seeing base at index i in the SAS
+	 * @return <b>log</b> probability of seeing base at index i in the SAS (splice
+	 *         acceptor-size)
 	 */
 	public double getLogBaseProbabilitySAS(char base, int i) {
 		return Math.log(baseProbabilitiesSAS[i][Utilities.baseToIndex(base)]);
 	}
 	
+	/**
+	 * @return maximum allowed intron size (in nt)
+	 */
 	public int getMaxIntronSize() {
 		return intronMax;
 	}
 	
+	/**
+	 * @return minimum allowed intron size (in nt)
+	 */
 	public int getMinIntronSize() {
 		return intronMin;
 	}
 	
+	/**
+	 * @return size of the splice donor site (GT, potentially followed by some other
+	 *         conserved sequence)
+	 */
 	public int getSDSSize() {
 		return baseProbabilitiesSDS.length;
 	}
-	
+
+	/**
+	 * @return size of the splice acceptor site (AG, potentially preceded by some
+	 *         other conserved sequence)
+	 */
 	public int getSASSize() {
 		return baseProbabilitiesSAS.length;
 	}
