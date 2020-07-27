@@ -3,7 +3,7 @@ package de.vetter.masterthesis.states;
 import java.util.Iterator;
 
 /**
- * States like the start-codon only emit exactly one sequence with probability one.
+ * States like the old start-codon only emit exactly one sequence with probability one.
  * 
  * @author David Emanuel Vetter
  */

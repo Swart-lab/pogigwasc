@@ -5,17 +5,22 @@ import java.util.Iterator;
 import de.vetter.masterthesis.ModelParameters;
 import de.vetter.masterthesis.Utilities;
 
+/**
+ * GHMM-State representation of a CDS: Always emits a single codon (permissible lengths={3}) 
+ * @author David Emanuel Vetter
+ */
 public class CodingState extends HMMStateWithStrandAndParameters {
 
 	/**
-	 * 
-	 * @param name
-	 * @param strand whether on forward strand
+	 * @see HMMStateWithStrandAndParameters#HMMStateWithStrandAndParameters(String, boolean, ModelParameters)
 	 */
 	public CodingState(String name, boolean strand, ModelParameters parameters) {
 		super(name, strand, parameters);
 	}
 
+	/**
+	 * @see de.vetter.masterthesis.states.HMMState#computeLogEmissionProbability(int, java.lang.String, java.lang.String)
+	 */
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 		if(newEmission.length() != 3)
@@ -33,6 +38,7 @@ public class CodingState extends HMMStateWithStrandAndParameters {
 	
 	/**
 	 * CDS allows only steps of size 3 -> thus, iterate only once
+	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLengths(int)
 	 */
 	@Override
 	public Iterable<Integer> iteratePermissibleLengths(final int l) {

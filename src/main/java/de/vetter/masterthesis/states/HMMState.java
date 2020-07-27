@@ -57,7 +57,7 @@ public abstract class HMMState {
 	/**
 	 * Computes the log_2 of the probability of emitting the newEmission when in
 	 * current State, having before been in previousState and having (from the
-	 * start) previously emitted emissionHistory.
+	 * start) previously emitted emissionHistory.<br>
 	 * 
 	 * To be implemented by concrete instances (probably ad-hoc-inheritors)
 	 * 

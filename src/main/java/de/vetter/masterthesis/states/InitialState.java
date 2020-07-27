@@ -1,5 +1,11 @@
 package de.vetter.masterthesis.states;
 
+/**
+ * The special initial state (cf. Stanke's dissertation): Can only emit the
+ * empty word. It has the reserved name {@link #INITIAL_STATE_NAME}
+ * 
+ * @author David Emanuel Vetter
+ */
 public class InitialState extends HMMState {
 
 	/** Name of the initial state; reserved for this state alone */

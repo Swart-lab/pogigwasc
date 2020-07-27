@@ -6,8 +6,12 @@ import de.vetter.masterthesis.ModelParameters;
 import de.vetter.masterthesis.Utilities;
 
 /**
- * Implements a state for introns, which only considers the emmission-length
- * when computing the emmission-probability (at this point)
+ * Implements a state for introns, which only allows a certain range of intron
+ * sizes (cf {@link ModelParameters#getMinIntronSize()} and
+ * {@link ModelParameters#getMaxIntronSize()})<br>
+ * 
+ * Further, sequence information at the ends of the intron (the 5' splice donor
+ * site SDS and the 3' splice acceptor site SAS) factor into the emission probability
  * 
  * @author David Emanuel Vetter
  */
@@ -17,6 +21,17 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 		super(name, strand, parameters);
 	}
 
+	/**
+	 * Intron emission probability: Consider both length and exact sequence of the
+	 * new emission: Require edges 5': GT and 3': AG, and take sequence preferences
+	 * at the SDS and SAS into account. Internal base frequency (inside intron,
+	 * outside SDS and SAS) will be similar to NCS base frequency. While the
+	 * base-distribution depends on the position in the emission, each position is
+	 * modeled as an independent random variable.
+	 * 
+	 * @see de.vetter.masterthesis.states.HMMState#computeLogEmissionProbability(int,
+	 *      java.lang.String, java.lang.String)
+	 */
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
 		if(newEmission.length() < 4 || newEmission.length() > parameters.getMaxIntronSize())
@@ -49,7 +64,10 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 
 	
 	/**
-	 * introns could maybe take arbitrary lengths >= 4, for performance, limit it to 50
+	 * introns could maybe take arbitrary lengths >= 4, for performance, limit it to
+	 * the allowed range of {l-max, ..., l-min} (note the inclusive upper end)
+	 * 
+	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLengths(int)
 	 */
 	@Override
 	public Iterable<Integer> iteratePermissibleLengths(final int l) {
@@ -58,11 +76,11 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 			@Override
 			public Iterator<Integer> iterator() {
 				return new Iterator<Integer>() {
-					private int currentLPrime = Math.max(0, l - 33);
+					private int currentLPrime = Math.max(0, l - parameters.getMaxIntronSize());
 					
 					@Override
 					public boolean hasNext() {
-						return currentLPrime < l - 3;
+						return currentLPrime < l - parameters.getMinIntronSize() + 1;
 					}
 
 					@Override
