@@ -275,13 +275,17 @@ public class ModelParameters {
 	public double getLogProbabilityIntronLength(int length) {
 		double result = Double.NEGATIVE_INFINITY;
 		
+		double poisson = length * Math.log(intronB) - intronB; 
+		poisson -= Utilities.logFactorial(length);
+		
 		if(intronMin <= length && length < intronB)
 			result = intronLogA + (intronB- length - 1) * Math.log(intronS);
 		
 		if(intronB <= length && length <= intronMax)
 			result = intronLogA + Math.log(intronP) + (length - intronB) * Math.log(intronR);
 		
-		return result;
+		//return result;
+		return poisson;
 	}
 	
 	/**
