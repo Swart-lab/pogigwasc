@@ -23,9 +23,8 @@ public class ModelParameters {
 	
 	private int startregionSize, stopregionSize;
 	
-	private int intronMin, intronMax, intronB;
-	private double intronS, intronR, intronP;
-	private double intronLogA;
+	private int intronMin, intronMax;
+	private double intronMean, intronTruncatedPoissonNormaliser;
 	
 	private double[] baseProbabilitiesNCS, baseProbabilitiesIntron, baseProbabilitiesStartregion;
 	
@@ -71,15 +70,9 @@ public class ModelParameters {
 			intronMin = Integer.parseInt(properties.getProperty(currentParameter));
 			currentParameter = "intron_maximum_length";
 			intronMax = Integer.parseInt(properties.getProperty(currentParameter));
-			currentParameter = "intron_distribution_breakpoint_b";
-			intronB = Integer.parseInt(properties.getProperty(currentParameter));
-			currentParameter = "intron_distribution_leftward_dropoff_s";
-			intronS = Double.parseDouble(properties.getProperty(currentParameter));
-			currentParameter = "intron_distribution_rightward_dropoff_r";
-			intronR = Double.parseDouble(properties.getProperty(currentParameter));
-			currentParameter = "intron_distribution_peak_proportion_p";
-			intronP = Double.parseDouble(properties.getProperty(currentParameter));
-			computeLogBaseTermForFiniteBidirectionalGeometricDistribution();
+			currentParameter = "intron_mean_length";
+			intronMean = Double.parseDouble(properties.getProperty(currentParameter));
+			computePoissonNormaliser();
 
 			
 			currentParameter = "base_frequencies_NCS";
@@ -239,33 +232,21 @@ public class ModelParameters {
 	}
 	
 	/**
-	 * Requires that all intron-distribution-parameters be already available. Then
-	 * computes the normaliser a (in logarithm)
+	 * Computes the "normaliser" (an additive constant) for the truncated poisson:
+	 * Since a hard minimum and maximum are enforced, while the poisson-distribution
+	 * generally allows smaller and larger values, just take the porbability of
+	 * picking a value outside the allowed range, and add it uniformly to all
+	 * allowed values (there are max-min+1 allowed values)
 	 */
-	private void computeLogBaseTermForFiniteBidirectionalGeometricDistribution() {
-		double leftSum = 1 - Math.pow(intronS, intronB - intronMin);
-		leftSum = leftSum / (1-intronS);
-		double rightSum = 1 - Math.pow(intronR, intronMax - intronB + 1);
-		rightSum = rightSum / (1-intronR);
-				
-		intronLogA = leftSum + intronP*rightSum;
-		
-		intronLogA = -Math.log(intronLogA);
-		
-		// For plotting in latex:
-		/*
-		 * private double[] LENGTH_PROBABILITIES =
-		 * new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-		 * 0.0, 0.0, 0.0, 0.0, 0.2188, 0.2812, 0.1042, 0.2292, 0.1146, 0.0208, 0.0104,
-		 * 0.0104, 0.0, 0.0, 0.0104, 0.0, 0.0, 0.0 }; int lambda = 19;
-		 * System.out.println("Intron-state: length-distribution:");
-		 * System.out.println("l,p,poisson,empirical"); double sum = 0; for(int k = 10;
-		 * k <= MAX + 1; k++) { double poisson = k * Math.log(LAMBDA) - LAMBDA; poisson
-		 * -= Utilities.logFactorial(k); System.out.println(k + "," +
-		 * Math.exp(logProbability(k)) + "," + Math.exp(poisson) + "," + (k <
-		 * LENGTH_PROBABILITIES.length ? LENGTH_PROBABILITIES[k] : 0)); sum +=
-		 * Math.exp(logProbability(k)); } System.out.println("sum=" + sum);
-		 */
+	private void computePoissonNormaliser() {
+		double sumOverValid= 0;
+		for(int l = intronMin; l <= intronMax; l++) {
+			sumOverValid += Math.exp(l * Math.log(intronMean) - Utilities.logFactorial(l));
+		}
+		intronTruncatedPoissonNormaliser = Math.log(sumOverValid) - intronMean;
+		intronTruncatedPoissonNormaliser = 1-Math.exp(intronTruncatedPoissonNormaliser);
+		intronTruncatedPoissonNormaliser = intronTruncatedPoissonNormaliser/(intronMax - intronMin + 1);
+		// This value will be ADDED to the probability of seeing any length within min-max.
 	}
 	
 	/**
@@ -273,18 +254,18 @@ public class ModelParameters {
 	 * @return log probability of seeing the given intron length
 	 */
 	public double getLogProbabilityIntronLength(int length) {
-		double result = Double.NEGATIVE_INFINITY;
+		// Poisson is truncated!
+		if(length < intronMin || intronMax < length)
+			return Double.NEGATIVE_INFINITY;
 		
-		double poisson = length * Math.log(intronB) - intronB; 
+		// This would be the normal poisson-probability
+		double poisson = length * Math.log(intronMean) - intronMean; 
 		poisson -= Utilities.logFactorial(length);
+		// However: Need/Want to add a little bit of normalisation to make up for normalisation:
+		poisson = Math.exp(poisson) + intronTruncatedPoissonNormaliser;
+		// this is no longer in log, so return to log:
+		poisson = Math.log(poisson);
 		
-		if(intronMin <= length && length < intronB)
-			result = intronLogA + (intronB- length - 1) * Math.log(intronS);
-		
-		if(intronB <= length && length <= intronMax)
-			result = intronLogA + Math.log(intronP) + (length - intronB) * Math.log(intronR);
-		
-		//return result;
 		return poisson;
 	}
 	

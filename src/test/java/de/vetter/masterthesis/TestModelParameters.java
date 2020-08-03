@@ -139,8 +139,6 @@ public class TestModelParameters {
 		assertEquals(Double.NEGATIVE_INFINITY, mp.getLogProbabilityIntronLength(31), TOLERANCE);
 		assertTrue(Double.NEGATIVE_INFINITY < mp.getLogProbabilityIntronLength(12));
 		assertTrue(Double.NEGATIVE_INFINITY < mp.getLogProbabilityIntronLength(30));
-		assertEquals(Math.log(0.55) + mp.getLogProbabilityIntronLength(17), mp.getLogProbabilityIntronLength(18), TOLERANCE);
-		// TODO: might actually check the entire distribution
 	}
 
 	@Test
