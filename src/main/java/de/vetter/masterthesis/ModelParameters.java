@@ -240,13 +240,31 @@ public class ModelParameters {
 	 */
 	private void computePoissonNormaliser() {
 		double sumOverValid= 0;
-		for(int l = intronMin; l <= intronMax; l++) {
-			sumOverValid += Math.exp(l * Math.log(intronMean) - Utilities.logFactorial(l));
+
+		double lambda = intronMean - intronMin;
+		for(int l = 0; l <= intronMax - intronMin; l++) {
+			sumOverValid += Math.exp(l * Math.log(lambda) - Utilities.logFactorial(l));
 		}
-		intronTruncatedPoissonNormaliser = Math.log(sumOverValid) - intronMean;
+
+		intronTruncatedPoissonNormaliser = Math.log(sumOverValid) - lambda;
 		intronTruncatedPoissonNormaliser = 1-Math.exp(intronTruncatedPoissonNormaliser);
 		intronTruncatedPoissonNormaliser = intronTruncatedPoissonNormaliser/(intronMax - intronMin + 1);
 		// This value will be ADDED to the probability of seeing any length within min-max.
+		
+		System.out.println("Intron-state: length-distribution:");
+		System.out.println("l,poisson,empirical");
+
+		double[] LENGTH_PROBABILITIES = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+				0.0, 0.0, 0.0, 0.0, 0.2188, 0.2812, 0.1042, 0.2292, 0.1146, 0.0208, 0.0104,
+				0.0104, 0.0, 0.0, 0.0104, 0.0, 0.0, 0.0 };
+		
+		double sum = 0;
+		for(int k = 0; k < intronMax + 2; k++) {
+			sum += Math.exp(getLogProbabilityIntronLength(k));
+			System.out.println(k + "," + Math.exp(getLogProbabilityIntronLength(k)) + ","
+					+ (k < LENGTH_PROBABILITIES.length ? LENGTH_PROBABILITIES[k] : 0));
+		}
+		System.out.println("\n sum = " + sum + " (should be 1)");
 	}
 	
 	/**
@@ -258,9 +276,13 @@ public class ModelParameters {
 		if(length < intronMin || intronMax < length)
 			return Double.NEGATIVE_INFINITY;
 		
+		// to get poisson with smaller variance: shift min to 0 (truncating anyways)
+		double lambda = intronMean - intronMin;
+		int k = length - intronMin;
+		
 		// This would be the normal poisson-probability
-		double poisson = length * Math.log(intronMean) - intronMean; 
-		poisson -= Utilities.logFactorial(length);
+		double poisson = k * Math.log(lambda) - lambda; 
+		poisson -= Utilities.logFactorial(k);
 		// However: Need/Want to add a little bit of normalisation to make up for normalisation:
 		poisson = Math.exp(poisson) + intronTruncatedPoissonNormaliser;
 		// this is no longer in log, so return to log:
