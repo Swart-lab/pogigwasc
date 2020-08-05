@@ -50,6 +50,7 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 		double baseUsage = 0;
 		/* GT AG have probability 1 */
 		for(int i = 0; i < length; i++) {
+			
 			if(i < parameters.getSDSSize()) {
 				baseUsage += parameters.getLogBaseProbabilitySDS(newEmission.charAt(i), i); 
 			} else if (i >= length - parameters.getSASSize()) {
@@ -57,7 +58,14 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 			} else {
 				baseUsage += parameters.getLogBaseProbabilityIntron(newEmission.charAt(i));
 			}
+			
+		} 
+		/* Compute without respect to intron-structure! This is the old style
+		baseUsage = 0;
+		for(int i = 2; i < length - 2; i++) {
+			baseUsage += parameters.getLogBaseProbabilityNCS(newEmission.charAt(i));
 		}
+		*/
 		
 		return lengthProb + baseUsage;
 	}

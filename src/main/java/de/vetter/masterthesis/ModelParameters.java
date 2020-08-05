@@ -62,6 +62,8 @@ public class ModelParameters {
 
 			currentParameter = "start_region_size";
 			startregionSize = Integer.parseInt(properties.getProperty(currentParameter));
+			// old start-region (i.e. just deterministic ATG):
+			// startregionSize = 3;
 			
 			currentParameter = "stop_region_size";
 			stopregionSize = Integer.parseInt(properties.getProperty(currentParameter));
