@@ -33,9 +33,7 @@ import de.vetter.masterthesis.states.*;
  * If no output file is specified, one will be created in the same directory as
  * the input-file, with date and time-information in its filename.<br>
  * If no parameter-file is specified, a default parameter-file (also, and mainly
- * used for code-testing) will be used
- * 
- * TODO: does this parameter-file handling still work if in a jar?
+ * used for code-testing) will be used (<b>this no longer works, if the executable is removed from the sources!</b>)
  */
 public class App {
 	/** State-names: Name states +... for forward strand, and -... for reverse strand */
@@ -122,6 +120,9 @@ public class App {
 		if (cmd.hasOption('p')) {
 			parameterFile = new File(cmd.getOptionValue('p'));
 		} else {
+			System.out.println("Trying to use default parameter-file:\n" + "THIS IS NOT RECOMMENDED\n"
+					+ "and only works, if the respective file is in the correct relative path.\n"
+					+ "The file will not be particularly fit to the specific prediction!");
 			parameterFile = new File(
 					"resources\\de\\vetter\\masterthesis\\parameter\\parameters-examplefile.properties");
 		}
@@ -329,7 +330,7 @@ public class App {
 		for (String line = reader.readLine(); line != null; line = reader.readLine()) {
 			if (line.startsWith(">")) {
 				if (currentHeader != null) {
-					doPredictions(ghmm, writer, currentHeader, currentSequence);
+					doPredictions(ghmm, writer, currentHeader, currentSequence, modelParameters);
 				}
 				currentHeader = line.substring(1);
 				currentSequence = "";
@@ -340,7 +341,7 @@ public class App {
 
 		// on last sequence
 		if (currentHeader != null) {
-			doPredictions(ghmm, writer, currentHeader, currentSequence);
+			doPredictions(ghmm, writer, currentHeader, currentSequence, modelParameters);
 		}
 
 		reader.close();
@@ -362,8 +363,8 @@ public class App {
 	 *                                  write into the out-file
 	 * @throws IllegalArgumentException if the sequence contains N, not just TGAC
 	 */
-	public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence)
-			throws IOException {
+	public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence,
+			ModelParameters parameters) throws IOException {
 		
 		System.out.println("\nPrediction genes in " + currentHeader + ":\n");
 		if (currentSequence.contains("NNN")) {
@@ -408,7 +409,9 @@ public class App {
 					}
 
 					if (currentFeature != GFFFeature.CDS)
-						startOfCurrentFeature = state.getName().equals(FORWARD_START) ? currentPos + 3 : currentPos;
+						startOfCurrentFeature = state.getName().equals(FORWARD_START)
+								? currentPos + (parameters.getStartRegionSize() - 3)
+								: currentPos;
 					// TODO ^ notice this! It is for the new StartRegion-state!
 					currentFeature = GFFFeature.CDS;
 
@@ -429,17 +432,17 @@ public class App {
 					break;
 
 				case FORWARD_STOP:
+					int firstbaseOfStop = currentPos + parameters.getStopRegionSize() - 3;
 					// CDS must precede
 					writer.write(currentHeader + "\tpredicted\t" + currentFeature.getCode() + "\t"
-							+ startOfCurrentFeature + "\t" + (currentPos + 20) + "\t.\t+\t.\t ");
+							+ startOfCurrentFeature + "\t" + (firstbaseOfStop - 1) + "\t.\t+\t.\t ");
 					writer.newLine();
 					// The actual stop
-					writer.write(currentHeader + "\tpredicted\tstop_codon\t" + (currentPos + 21) + "\t"
-							+ (currentPos + 23) + "\t.\t+\t.\t ");
+					writer.write(currentHeader + "\tpredicted\tstop_codon\t" + firstbaseOfStop + "\t"
+							+ (firstbaseOfStop + 2) + "\t.\t+\t.\t ");
 					writer.newLine();
 					currentFeature = null; // NCS follows
-					startOfCurrentFeature = currentPos + 24; // not strictly necessary, following NCS will take care of
-																// this. Also: Magic literal -> ModelParameters TODO
+					startOfCurrentFeature = currentPos + parameters.getStopRegionSize(); 
 					break;
 				case REVERSE_START:
 					// Coming from CDS: -M is to be counted into the CDS
@@ -447,7 +450,7 @@ public class App {
 							+ startOfCurrentFeature + "\t" + (currentPos + 2) + "\t.\t-\t.\t ");
 					writer.newLine();
 					currentFeature = null; // NCS follows
-					startOfCurrentFeature = currentPos + 3; // that's where the NCS starts
+					startOfCurrentFeature = currentPos + (parameters.getStartRegionSize() - 3); // that's where the NCS starts
 					break;
 				case REVERSE_STOP:
 					writer.write(currentHeader + "\tpredicted\tstop_codon\t" + currentPos + "\t" + (currentPos + 2)

@@ -252,7 +252,7 @@ public class ModelParameters {
 		intronTruncatedPoissonNormaliser = 1-Math.exp(intronTruncatedPoissonNormaliser);
 		intronTruncatedPoissonNormaliser = intronTruncatedPoissonNormaliser/(intronMax - intronMin + 1);
 		// This value will be ADDED to the probability of seeing any length within min-max.
-		
+		/*
 		System.out.println("Intron-state: length-distribution:");
 		System.out.println("l,poisson,empirical");
 
@@ -267,6 +267,7 @@ public class ModelParameters {
 					+ (k < LENGTH_PROBABILITIES.length ? LENGTH_PROBABILITIES[k] : 0));
 		}
 		System.out.println("\n sum = " + sum + " (should be 1)");
+		*/
 	}
 	
 	/**
