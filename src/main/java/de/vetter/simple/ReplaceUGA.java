@@ -248,6 +248,8 @@ public class ReplaceUGA {
 	}
 
 	/**
+	 * Tries to find all stop (and all non-coding) UGAs in the given sequence. I.e. only sense-UGA will be ignored
+	 * 
 	 * @param occurrences this list will be filled with occurrence-indices: They can
 	 *                    be both negative and positive, with negative indices
 	 *                    simply denoting that the codon in question is TCA, not

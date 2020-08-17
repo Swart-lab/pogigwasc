@@ -366,7 +366,7 @@ public class App {
 	public static void doPredictions(GHMM ghmm, BufferedWriter writer, String currentHeader, String currentSequence,
 			ModelParameters parameters) throws IOException {
 		
-		System.out.println("\nPrediction genes in " + currentHeader + ":\n");
+		System.out.println("\nPredicting genes in " + currentHeader + ":\n");
 		if (currentSequence.contains("NNN")) {
 			throw new IllegalArgumentException(
 					"The given sequence contained uncharacterised Nucleotides (N). Please provide contigs, not scaffolds");
