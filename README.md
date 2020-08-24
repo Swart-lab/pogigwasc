@@ -19,3 +19,17 @@ Prerequisites: **install Eclipse**
  2. right-click the pom-xml and choose `Run As` > `2 Maven build...`, then enter e.g. `package appassembler:assemble` for the goals and run
    _This should produce an output as described above_
  3. Rightclick `de.vetter.masterthesis/App.java` and run as java application. This should give the usual help-text (set command-line args via Run>Run Configurations)
+ 
+# Program structure overview:
+This project contains 2 separate parts:
+ 1. The GHMM/Gene-prediction in `src/main/java/de/vetter/masterthesis`
+ 2. simplistic UGA-cleaning in `src/main/java/de/vetter/simple`
+ 
+The second one is more a programming sketch, the first will be explained in slightly more detail:
+Directly in `src/main/java/de/vetter/masterthesis`, most relevant classes for gene-prediction are found, in particular, the main-class `App` with the `main`-method that defines what happens, when the program is run (cf. pom.xml). 
+ - `ModelParameters` is used top load and query the model-parameters from an external file
+ - `Viterbi` and `ViterbiSeed` implement the viterbi-algorithm
+ - `GHMM` implements GHMMs
+ - `Pair` and `GFFFeature` are very small and trivial (implementing a pair, and being an enum for writing GFF3-files)
+ - The folder/subpackage `states/` contains the implementations of the states: These take care of emission probabilities and enumerating valid emission lengths
+The Classes are documented in more detail in their respective files. Tests are found in `src/test/java/de/vetter/masterthesis`, where running `AllTests` runs all tests.
