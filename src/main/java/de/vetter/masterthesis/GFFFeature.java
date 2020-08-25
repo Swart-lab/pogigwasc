@@ -2,8 +2,7 @@ package de.vetter.masterthesis;
 
 public enum GFFFeature {
 	
-	CDS("CDS"), 
-	THREE_PRIME_UTR("three_prime_utr"), 
+	CDS("CDS"),
 	INTRON("intron"),
 	STOP_CODON("stop_codon");
 	
