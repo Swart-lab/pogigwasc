@@ -367,7 +367,7 @@ public class App {
 			ModelParameters parameters) throws IOException {
 		
 		System.out.println("\nPredicting genes in " + currentHeader + ":\n");
-		if (currentSequence.contains("NNN")) {
+		if (currentSequence.contains("N")) { // or three?
 			throw new IllegalArgumentException(
 					"The given sequence contained uncharacterised Nucleotides (N). Please provide contigs, not scaffolds");
 		}

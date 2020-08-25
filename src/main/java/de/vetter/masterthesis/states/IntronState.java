@@ -34,12 +34,14 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 	 */
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-		if(newEmission.length() < 4 || newEmission.length() > parameters.getMaxIntronSize())
+		if (newEmission.length() < parameters.getMinIntronSize()
+				|| newEmission.length() > parameters.getMaxIntronSize())
 			return Double.NEGATIVE_INFINITY;
 		
 		if(isReverse())
 			newEmission = Utilities.reverseComplement(newEmission);
 		
+		// TODO: redundant
 		if(! (newEmission.startsWith("GT") && newEmission.endsWith("AG")))
 			return Double.NEGATIVE_INFINITY;
 		
