@@ -30,10 +30,19 @@ public class FixedSequenceState extends HMMState {
 	}
 	
 	/**
+	 * Allows only the length of this states fixed sequence
+	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 */
+	@Override
+	public int getSupremumPermissibleEmissionLength() {
+		return sequence.length();
+	}
+	
+	/**
 	 * Can only make step of size |fixedSequence|
 	 */
 	@Override
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

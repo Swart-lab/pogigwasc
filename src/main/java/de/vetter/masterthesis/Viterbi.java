@@ -65,6 +65,15 @@ public class Viterbi {
 			viterbiVariables[state][0] = Double.NEGATIVE_INFINITY;
 		}
 		
+		// collect the longest possible emission that could start the sequence:
+		int maxInitialEmissionLength = 0;
+		for(int q = 2; q < stateCount; q++) {
+			if(model.getLogTransitionProbability(0, q) > Double.NEGATIVE_INFINITY)
+				maxInitialEmissionLength = Math.max(maxInitialEmissionLength, model.getState(q).getSupremumPermissibleEmissionLength());
+		}
+		
+		System.out.println(" Viterbi: Maximum initial emission length = " + maxInitialEmissionLength + "\n");
+		
 		// 'Recursion'
 		for(int l = 1; l < sequence.length() + 1; l++) {
 			for(int q = 0; q < stateCount; q++) {
@@ -73,15 +82,14 @@ public class Viterbi {
 				double max = Double.NEGATIVE_INFINITY;
 				for (int qPrime = 0; qPrime < stateCount; qPrime++) {
 					if(model.getLogTransitionProbability(qPrime, q) > Double.NEGATIVE_INFINITY && qPrime != 1) {
-						if(qPrime == 0 && l < 10) {
-							// this causes slowdown: for large L, no point in doing this;
+						if(qPrime == 0 && l < maxInitialEmissionLength) {
 							max = Math.max(max,
 									viterbiVariables[qPrime][0] + model.getLogTransitionProbability(qPrime, q)
 											+ model.getLogEmissionProbability(0, q, "",
 													sequence.substring(0, l)));
 						} else {
 							// q' \in Q, i.e. neither initial nor terminal state (cannot come from the terminal state)
-							for(int lPrime : model.getState(q).iteratePermissibleLengths(l)) {
+							for(int lPrime : model.getState(q).iteratePermissibleLPrimes(l)) {
 								max = Math.max(max,
 										viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
 												+ model.getLogEmissionProbability(qPrime, q,

@@ -41,9 +41,9 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 		if(isReverse())
 			newEmission = Utilities.reverseComplement(newEmission);
 		
-		// TODO: redundant
+		// TODO/Note: This is purely for speedup, but leads to a loss of generality
 		if(! (newEmission.startsWith("GT") && newEmission.endsWith("AG")))
-			return Double.NEGATIVE_INFINITY;
+		 	return Double.NEGATIVE_INFINITY;
 		
 		int length = newEmission.length();
 		
@@ -60,7 +60,9 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 			} else {
 				baseUsage += parameters.getLogBaseProbabilityIntron(newEmission.charAt(i));
 			}
-			
+			// TODO/Note: This is purely for speedup, with no loss of generality -- the speedup is however smaller than for the above version.
+			// if(baseUsage == Double.NEGATIVE_INFINITY)
+			// 	return baseUsage;
 		} 
 		/* Compute without respect to intron-structure! This is the old style
 		baseUsage = 0;
@@ -72,15 +74,23 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 		return lengthProb + baseUsage;
 	}
 
+	/**
+	 * Intron allows maximum intron length
+	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 */
+	@Override
+	public int getSupremumPermissibleEmissionLength() {
+		return parameters.getMaxIntronSize();
+	}
 	
 	/**
 	 * introns could maybe take arbitrary lengths >= 4, for performance, limit it to
 	 * the allowed range of {l-max, ..., l-min} (note the inclusive upper end)
 	 * 
-	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLengths(int)
+	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLPrimes(int)
 	 */
 	@Override
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

@@ -18,10 +18,19 @@ public class NoncodingState extends HMMStateWithStrandAndParameters {
 	}
 	
 	/**
+	 * NCS allows only a length of 1
+	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 */
+	@Override
+	public int getSupremumPermissibleEmissionLength() {
+		return 1;
+	}
+	
+	/**
 	 * NCS allows only steps of size 1 -> thus, iterate only once
 	 */
 	@Override
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

@@ -4,7 +4,7 @@ import java.util.Iterator;
 
 /**
  * HMM state with one fixed emission length, and thus with a well-known
- * {@link #iteratePermissibleLengths(int)}. The exact emission probability is
+ * {@link #iteratePermissibleLPrimes(int)}. The exact emission probability is
  * still to be implemented by the heirs
  * 
  * @author David Emanuel Vetter
@@ -29,11 +29,20 @@ public abstract class ConstantLengthState extends HMMState {
 	}
 	
 	/**
-	 * constant length -> only one previous l' to check
-	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLengths(int)
+	 * It is the constant length
+	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public int getSupremumPermissibleEmissionLength() {
+		return length;
+	}
+	
+	/**
+	 * constant length -> only one previous l' to check
+	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLPrimes(int)
+	 */
+	@Override
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

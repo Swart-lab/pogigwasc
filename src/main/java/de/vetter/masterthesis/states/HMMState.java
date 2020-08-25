@@ -26,12 +26,21 @@ public abstract class HMMState {
 	}
 	
 	/**
+	 * Override this in inheriting states
+	 * 
+	 * @return the supremum allowed emission length (+infinity by default, various values in daughter classes)
+	 */
+	public int getSupremumPermissibleEmissionLength() {
+		return Integer.MAX_VALUE;
+	}
+	
+	/**
 	 * Override this in inheriting states to limit the iteration to only sensible lPrimes.
 	 * 
 	 * @param l from viterbi-recursion: this is the upper limit (exclusive) of the values that are to be iterated.
 	 * @return an iterator iterating from 0 to l-1 (inclusive), in the basic form
 	 */
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

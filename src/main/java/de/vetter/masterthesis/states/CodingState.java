@@ -37,11 +37,20 @@ public class CodingState extends HMMStateWithStrandAndParameters {
 	}
 	
 	/**
-	 * CDS allows only steps of size 3 -> thus, iterate only once
-	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLengths(int)
+	 * CDS allows only a length of 3
+	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public int getSupremumPermissibleEmissionLength() {
+		return 3;
+	}
+	
+	/**
+	 * CDS allows only steps of size 3 -> thus, iterate only once
+	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLPrimes(int)
+	 */
+	@Override
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

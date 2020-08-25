@@ -33,10 +33,18 @@ public class StartRegionState extends HMMStateWithStrandAndParameters {
 	}
 
 	/**
+	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 */
+	@Override
+	public int getSupremumPermissibleEmissionLength() {
+		return parameters.getStartRegionSize();
+	}
+	
+	/**
 	 * StartRegion allows only size 6 nt (3 before ATG, then ATG)
 	 */
 	@Override
-	public Iterable<Integer> iteratePermissibleLengths(final int l) {
+	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
 		return new Iterable<Integer>() {
 
 			@Override

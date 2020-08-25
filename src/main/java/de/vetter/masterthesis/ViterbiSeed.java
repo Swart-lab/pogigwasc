@@ -118,7 +118,7 @@ public class ViterbiSeed {
 					argmaxes.add(new Pair<Integer, Integer>(0, 0));
 				}
 			} else {
-				for(int lPrime : model.getState(q).iteratePermissibleLengths(l)) {
+				for(int lPrime : model.getState(q).iteratePermissibleLPrimes(l)) {
 					double candidate = viterbiVariables[qPrime][lPrime] + model.getLogTransitionProbability(qPrime, q)
 							+ model.getLogEmissionProbability(qPrime, q, 
 									abbreviating ? null : sequence.substring(0, lPrime),
