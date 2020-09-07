@@ -1,4 +1,4 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 import java.util.Iterator;
 
@@ -31,7 +31,7 @@ public class FixedSequenceState extends HMMState {
 	
 	/**
 	 * Allows only the length of this states fixed sequence
-	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 * @see de.vetter.pogigwasc.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
 	public int getSupremumPermissibleEmissionLength() {

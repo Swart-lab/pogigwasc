@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 /**
  * Trivial pair class

@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import de.vetter.pogigwasc.Utilities;
+
 public class TestUtilities {
 
 	@Test

@@ -1,11 +1,11 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vetter.masterthesis.states.HMMState;
-import de.vetter.masterthesis.states.InitialState;
-import de.vetter.masterthesis.states.TerminalState;
+import de.vetter.pogigwasc.states.HMMState;
+import de.vetter.pogigwasc.states.InitialState;
+import de.vetter.pogigwasc.states.TerminalState;
 
 /**
  * Implements a generalized Hidden Markov Model, which always has an initial

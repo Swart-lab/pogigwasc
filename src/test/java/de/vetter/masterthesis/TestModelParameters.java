@@ -10,6 +10,8 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
+import de.vetter.pogigwasc.ModelParameters;
+
 public class TestModelParameters {
 
 	ModelParameters mp;

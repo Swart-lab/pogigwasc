@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 /**
  * Collection of some general methods with no particular place. This class implements the base-index-correspondence:

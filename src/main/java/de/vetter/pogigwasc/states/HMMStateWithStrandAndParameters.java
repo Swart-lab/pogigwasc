@@ -1,6 +1,6 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
-import de.vetter.masterthesis.ModelParameters;
+import de.vetter.pogigwasc.ModelParameters;
 
 public abstract class HMMStateWithStrandAndParameters extends HMMState {
 

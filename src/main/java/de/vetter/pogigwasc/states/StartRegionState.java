@@ -1,9 +1,9 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 import java.util.Iterator;
 
-import de.vetter.masterthesis.ModelParameters;
-import de.vetter.masterthesis.Utilities;
+import de.vetter.pogigwasc.ModelParameters;
+import de.vetter.pogigwasc.Utilities;
 
 public class StartRegionState extends HMMStateWithStrandAndParameters {
 	
@@ -26,14 +26,16 @@ public class StartRegionState extends HMMStateWithStrandAndParameters {
 		}
 		
 		double result = 0;
+		/* */
 		for(int i = 0; i < parameters.getStartRegionSize() - 3; i++) {
 			result += parameters.getLogBaseProbabilityStartRegion(newEmission.charAt(i));
 		}
+		
 		return result;
 	}
 
 	/**
-	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 * @see de.vetter.pogigwasc.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
 	public int getSupremumPermissibleEmissionLength() {

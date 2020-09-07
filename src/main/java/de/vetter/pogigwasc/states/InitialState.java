@@ -1,4 +1,4 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 /**
  * The special initial state (cf. Stanke's dissertation): Can only emit the

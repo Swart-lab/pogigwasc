@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import java.io.FileReader;
 import java.io.IOException;

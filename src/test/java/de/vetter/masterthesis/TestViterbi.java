@@ -6,7 +6,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.vetter.masterthesis.states.HMMState;
+import de.vetter.pogigwasc.GHMM;
+import de.vetter.pogigwasc.Pair;
+import de.vetter.pogigwasc.Viterbi;
+import de.vetter.pogigwasc.states.HMMState;
 
 public class TestViterbi {
 

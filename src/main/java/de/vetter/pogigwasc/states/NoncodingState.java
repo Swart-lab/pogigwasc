@@ -1,8 +1,8 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 import java.util.Iterator;
 
-import de.vetter.masterthesis.ModelParameters;
+import de.vetter.pogigwasc.ModelParameters;
 
 public class NoncodingState extends HMMStateWithStrandAndParameters {
 
@@ -19,7 +19,7 @@ public class NoncodingState extends HMMStateWithStrandAndParameters {
 	
 	/**
 	 * NCS allows only a length of 1
-	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 * @see de.vetter.pogigwasc.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
 	public int getSupremumPermissibleEmissionLength() {

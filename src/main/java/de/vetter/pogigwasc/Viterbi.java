@@ -1,9 +1,9 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vetter.masterthesis.states.HMMState;
+import de.vetter.pogigwasc.states.HMMState;
 
 /**
  * Implements the viterbi algorithm as described by Stanke (AUGUSTUS): Construct

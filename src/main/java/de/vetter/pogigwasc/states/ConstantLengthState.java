@@ -1,4 +1,4 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 import java.util.Iterator;
 
@@ -30,7 +30,7 @@ public abstract class ConstantLengthState extends HMMState {
 	
 	/**
 	 * It is the constant length
-	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 * @see de.vetter.pogigwasc.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
 	public int getSupremumPermissibleEmissionLength() {
@@ -39,7 +39,7 @@ public abstract class ConstantLengthState extends HMMState {
 	
 	/**
 	 * constant length -> only one previous l' to check
-	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLPrimes(int)
+	 * @see de.vetter.pogigwasc.states.HMMState#iteratePermissibleLPrimes(int)
 	 */
 	@Override
 	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {

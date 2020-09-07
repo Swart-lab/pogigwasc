@@ -1,9 +1,9 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 import java.util.Iterator;
 
-import de.vetter.masterthesis.ModelParameters;
-import de.vetter.masterthesis.Utilities;
+import de.vetter.pogigwasc.ModelParameters;
+import de.vetter.pogigwasc.Utilities;
 
 /**
  * GHMM-State representation of a CDS: Always emits a single codon (permissible lengths={3}) 
@@ -19,7 +19,7 @@ public class CodingState extends HMMStateWithStrandAndParameters {
 	}
 
 	/**
-	 * @see de.vetter.masterthesis.states.HMMState#computeLogEmissionProbability(int, java.lang.String, java.lang.String)
+	 * @see de.vetter.pogigwasc.states.HMMState#computeLogEmissionProbability(int, java.lang.String, java.lang.String)
 	 */
 	@Override
 	public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
@@ -38,7 +38,7 @@ public class CodingState extends HMMStateWithStrandAndParameters {
 	
 	/**
 	 * CDS allows only a length of 3
-	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 * @see de.vetter.pogigwasc.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
 	public int getSupremumPermissibleEmissionLength() {
@@ -47,7 +47,7 @@ public class CodingState extends HMMStateWithStrandAndParameters {
 	
 	/**
 	 * CDS allows only steps of size 3 -> thus, iterate only once
-	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLPrimes(int)
+	 * @see de.vetter.pogigwasc.states.HMMState#iteratePermissibleLPrimes(int)
 	 */
 	@Override
 	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {

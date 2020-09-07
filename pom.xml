@@ -5,8 +5,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>de.vetter</groupId>
-  <artifactId>masterthesis</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>pogigwasc</artifactId>
+  <version>1</version>
 
   <name>masterthesis</name>
   <!-- FIXME change it to the project's website -->
@@ -72,7 +72,7 @@
           <configuration>
 	        <programs>
 	          <program>
-	            <mainClass>de.vetter.masterthesis.App</mainClass>
+	            <mainClass>de.vetter.pogigwasc.App</mainClass>
 	            <id>ghmm-predict</id>
 	          </program>
 	        </programs>

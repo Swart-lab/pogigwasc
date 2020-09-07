@@ -4,10 +4,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.vetter.masterthesis.states.FixedSequenceState;
-import de.vetter.masterthesis.states.InitialState;
-import de.vetter.masterthesis.states.IntronState;
-import de.vetter.masterthesis.states.TerminalState;
+import de.vetter.pogigwasc.GHMM;
+import de.vetter.pogigwasc.states.FixedSequenceState;
+import de.vetter.pogigwasc.states.InitialState;
+import de.vetter.pogigwasc.states.IntronState;
+import de.vetter.pogigwasc.states.TerminalState;
 
 /**
  * 

@@ -1,9 +1,9 @@
-package de.vetter.masterthesis.states;
+package de.vetter.pogigwasc.states;
 
 import java.util.Iterator;
 
-import de.vetter.masterthesis.ModelParameters;
-import de.vetter.masterthesis.Utilities;
+import de.vetter.pogigwasc.ModelParameters;
+import de.vetter.pogigwasc.Utilities;
 
 /**
  * Implements a state for introns, which only allows a certain range of intron
@@ -29,7 +29,7 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 	 * base-distribution depends on the position in the emission, each position is
 	 * modeled as an independent random variable.
 	 * 
-	 * @see de.vetter.masterthesis.states.HMMState#computeLogEmissionProbability(int,
+	 * @see de.vetter.pogigwasc.states.HMMState#computeLogEmissionProbability(int,
 	 *      java.lang.String, java.lang.String)
 	 */
 	@Override
@@ -64,19 +64,19 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 			// if(baseUsage == Double.NEGATIVE_INFINITY)
 			// 	return baseUsage;
 		} 
-		/* Compute without respect to intron-structure! This is the old style
+		/* Compute without respect to intron-structure! This is the old style */
 		baseUsage = 0;
 		for(int i = 2; i < length - 2; i++) {
 			baseUsage += parameters.getLogBaseProbabilityNCS(newEmission.charAt(i));
 		}
-		*/
+		
 		
 		return lengthProb + baseUsage;
 	}
 
 	/**
 	 * Intron allows maximum intron length
-	 * @see de.vetter.masterthesis.states.HMMState#getSupremumPermissibleEmissionLength()
+	 * @see de.vetter.pogigwasc.states.HMMState#getSupremumPermissibleEmissionLength()
 	 */
 	@Override
 	public int getSupremumPermissibleEmissionLength() {
@@ -87,7 +87,7 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 	 * introns could maybe take arbitrary lengths >= 4, for performance, limit it to
 	 * the allowed range of {l-max, ..., l-min} (note the inclusive upper end)
 	 * 
-	 * @see de.vetter.masterthesis.states.HMMState#iteratePermissibleLPrimes(int)
+	 * @see de.vetter.pogigwasc.states.HMMState#iteratePermissibleLPrimes(int)
 	 */
 	@Override
 	public Iterable<Integer> iteratePermissibleLPrimes(final int l) {
