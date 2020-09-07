@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import de.vetter.pogigwasc.GHMM;
 import de.vetter.pogigwasc.Pair;
+import de.vetter.pogigwasc.Parse;
 import de.vetter.pogigwasc.Viterbi;
 import de.vetter.pogigwasc.states.HMMState;
 
@@ -54,14 +55,20 @@ public class TestViterbi {
 		System.out.println(ghmm);
 		
 		Viterbi viterbi = new Viterbi(ghmm, "11011010110000000111111011");
-		for(List<Pair<HMMState, Integer>> parse : viterbi.computeParses()) {
+		for(Parse parse : viterbi.computeParses()) {
 			System.out.print("\nParse:");
-			for(Pair<HMMState, Integer> s : parse) {
-				System.out.print(s.getFirst().getName() + ":" + s.getSecond() + " - ");
+			for(int i = 0; i < parse.getNumberOfSteps(); i++) {
+				System.out.print(parse.get(i).getFirst().getName() + ":" + parse.get(i).getSecond() + " - ");
 			}
 		}
 		// Because there is a sequence of seven 0 in the sequence: can either have the first or last be emitted by A
 		assertEquals(2, viterbi.computeParses().size());
+		
+		viterbi = new Viterbi(ghmm, "11011010110000000111111011");
+		viterbi.setAbbreviating(true);
+		// Because there is a sequence of seven 0 in the sequence: can either have the first or last be emitted by A
+		assertEquals(2, viterbi.computeParses().size());
+		
 	}
 
 }

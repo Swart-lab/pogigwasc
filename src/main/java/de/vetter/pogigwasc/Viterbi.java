@@ -115,7 +115,7 @@ public class Viterbi {
 	 * Computes all most likely parses (and reports progress in System.out)
 	 * @return A List of Parses (where each parse is a list of pairs of a state and the emission-length from that state)
 	 */
-	public List<List<Pair<HMMState, Integer>>> computeParses() {
+	public List<Parse> computeParses() {
 		computeViterbiVariables();
 		ArrayList<ViterbiSeed> workLoad = new ArrayList<ViterbiSeed>();
 		ArrayList<ViterbiSeed> finished = new ArrayList<ViterbiSeed>(); // here put all seeds that reach l=0
@@ -150,16 +150,15 @@ public class Viterbi {
 		}
 		
 		// This corresponds to the finalisation described by Stanke on page 15.
-		ArrayList<List<Pair<HMMState, Integer>>> parses = new ArrayList<List<Pair<HMMState, Integer>>>();
-		for(ViterbiSeed startSeed : finished) {
-			ArrayList<Pair<HMMState, Integer>> parse = new ArrayList<Pair<HMMState, Integer>>();
+		ArrayList<Parse> parses = new ArrayList<Parse>();
+		for (ViterbiSeed startSeed : finished) {
+			Parse parse = new Parse();
 			ViterbiSeed current = startSeed;
-			while(current.getPrevious() != null) {
-				parse.add(new Pair<HMMState, Integer>(model.getState(current.getPrevious().getQ()),
-						current.getPrevious().getL() - current.getL()));
+			while (current.getPrevious() != null) {
+				parse.add(model.getState(current.getPrevious().getQ()), current.getPrevious().getL() - current.getL());
 				current = current.getPrevious();
 			}
-			
+
 			parses.add(parse);
 		}
 		

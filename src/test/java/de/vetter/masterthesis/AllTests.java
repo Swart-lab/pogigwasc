@@ -11,7 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
  * @author David Emanuel Vetter
  */
 @RunWith(value=Suite.class)
-@SuiteClasses(value={TestGHMM.class, TestViterbi.class, TestPair.class, TestModelParameters.class, TestUtilities.class})
+@SuiteClasses(value={TestGHMM.class, TestViterbi.class, TestPair.class, TestModelParameters.class, TestUtilities.class, TestParse.class, TestParseToGFF.class})
 public class AllTests {
 
 }
