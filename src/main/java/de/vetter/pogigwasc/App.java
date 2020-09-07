@@ -1,6 +1,5 @@
 package de.vetter.pogigwasc;
 
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -9,8 +8,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import de.vetter.pogigwasc.states.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -64,14 +61,16 @@ public class App {
 		Option param = new Option("p", "parameters", true, "parameter-file in java's properties-format");
 		commandLineOptions.addOption(param);
 		
+		Option noIntrons = new Option("n", "no-introns", false, "if set, RNA-sequences (still TCAG) are assumed, and no introns are predicted");
+		commandLineOptions.addOption(noIntrons);
+		
 		CommandLine cmd = new DefaultParser().parse(commandLineOptions, args, true);
 		
 		/** Generally nice behaviour: if one simply runs the program without sufficient parameters: provide help */
-		if(cmd.hasOption('h') || !cmd.hasOption('i')) {
-			new HelpFormatter().printHelp("... -i infile.fasta [-o outfile] [-p parameterfile.properties]", commandLineOptions);
+		if(cmd.hasOption('h') || !cmd.hasOption('i') || !cmd.hasOption('p')) {
+			new HelpFormatter().printHelp("... -i infile.fasta -p parameterfile.properties [-o outfile] [--no-introns]", commandLineOptions);
 			return;
 		}
-
 		
 		/** File management */
 
@@ -93,21 +92,14 @@ public class App {
 
 		writer = new BufferedWriter(new FileWriter(output));
 
-		File parameterFile;
-		if (cmd.hasOption('p')) {
-			parameterFile = new File(cmd.getOptionValue('p'));
-		} else {
-			System.out.println("Trying to use default parameter-file:\n" + "THIS IS NOT RECOMMENDED\n"
-					+ "and only works, if the respective file is in the correct relative path.\n"
-					+ "The file will not be particularly fit to the specific prediction!");
-			parameterFile = new File(
-					"resources\\de\\vetter\\masterthesis\\parameter\\parameters-examplefile.properties");
-		}
-		 
+		File parameterFile = new File(cmd.getOptionValue('p'));
 		final ModelParameters modelParameters = new ModelParameters(new FileReader(parameterFile));
 
-		
-		GHMM ghmm = new LoxodesMagnusGHMM(modelParameters);
+		GHMM ghmm;
+		if(cmd.hasOption('n')) {
+			System.out.println("Running in intron-less mode");
+		}
+		ghmm = new LoxodesMagnusGHMM(modelParameters);
 
 		System.out.println(ghmm);
 
