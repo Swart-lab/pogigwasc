@@ -64,12 +64,12 @@ public class IntronState extends HMMStateWithStrandAndParameters {
 			// if(baseUsage == Double.NEGATIVE_INFINITY)
 			// 	return baseUsage;
 		} 
-		/* Compute without respect to intron-structure! This is the old style */
+		/* Compute without respect to intron-structure! This is the old style 
 		baseUsage = 0;
 		for(int i = 2; i < length - 2; i++) {
 			baseUsage += parameters.getLogBaseProbabilityNCS(newEmission.charAt(i));
 		}
-		
+		*/
 		
 		return lengthProb + baseUsage;
 	}
