@@ -9,7 +9,7 @@ Prerequisites: **install Maven**
 
  1. download the code as a zip-file (from github) and extract the contents to some directory
  2. navigate to that directory (more precisely: navigate to the directory `masterthesis-master`, containing the **pom.xml**) and run the following maven command: `mvn package appassembler:assemble`
-   _(this should print quite a bunch of information into the console; including (green) text informing about the number of tests run, and the number of failures encountered -- there should no be any Failures or errors; at the end, 'BUILD SUCCESS' should be printed to the console)_
+   _(this should print quite a bunch of information into the console; including (green) text informing about the number of tests run, and the number of failures encountered -- there should not be any Failures or errors; at the end, 'BUILD SUCCESS' should be printed to the console)_
  3. from the same directory, run `target/appassembler/bin/ghmm-predict`: this should print the standard help-text
 
 To move the compiled program, copy/move the **entire** `appassembler`-directory (which can be renamed) -- it does not suffice to copy/move just the generated `target/appassembler/bin/ghmm-predict` file
@@ -33,6 +33,8 @@ Directly in `src/main/java/de/vetter/pogigwasc`, most relevant classes for gene-
  - `ModelParameters` is used to load and query the model-parameters from an external file
  - `Viterbi` and `ViterbiSeed` implement the viterbi-algorithm
  - `GHMM` implements GHMMs
+ - `LoxodesMagnusGHMM` holds the exact model used for _Loxodes magnus_ (and extends `GHMM`)
+ - `LoxodesMagnusIntronless` holds the model used for intronless predictions in _Loxodes magnus_
  - `Pair` and `GFFFeature` are very small and trivial (implementing a pair, and being an enum for writing GFF3-files)
  - The folder/subpackage `states/` contains the implementations of the states: These take care of emission probabilities and enumerating valid emission lengths
 

@@ -1,8 +1,8 @@
 package de.vetter.pogigwasc;
 
 import de.vetter.pogigwasc.states.CodingState;
-import de.vetter.pogigwasc.states.ConstantLengthState;
 import de.vetter.pogigwasc.states.HMMState;
+import de.vetter.pogigwasc.states.InterruptedCodonState;
 import de.vetter.pogigwasc.states.IntronState;
 import de.vetter.pogigwasc.states.NoncodingState;
 import de.vetter.pogigwasc.states.StartRegionState;
@@ -59,52 +59,14 @@ public class LoxodesMagnusGHMM extends GHMM {
 		addState(new IntronState(FORWARD_INTRON_0_0, true, modelParameters));
 
 		/** intron preceded by one nt and followed by two nt of a codon */
-		addState(new ConstantLengthState(FORWARD_PREINTRON_ONE, 1) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// This is the first base of a codon -> use empirical 1st-position probability
-				if (newEmission.length() != 1)
-					return Double.NEGATIVE_INFINITY;
-
-				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 0);
-			}
-		});
+		addState(new InterruptedCodonState(FORWARD_PREINTRON_ONE, true, true, 1, modelParameters));
 		addState(new IntronState(FORWARD_INTRON_1_2, true, modelParameters));
-		addState(new ConstantLengthState(FORWARD_POSTINTRON_TWO, 2) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// These are the second and third of a codon -> use respective empirical distrs
-				if (newEmission.length() != 2)
-					return Double.NEGATIVE_INFINITY;
-
-				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 1)
-						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
-			}
-		});
+		addState(new InterruptedCodonState(FORWARD_POSTINTRON_TWO, true, false, 2, modelParameters));
 
 		/** intron preceded by two nt and followed by one nt of a codon */
-		addState(new ConstantLengthState(FORWARD_PREINTRON_TWO, 2) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// These are the first and second of a codon -> use respective empirical distrs
-				if (newEmission.length() != 2)
-					return Double.NEGATIVE_INFINITY;
-
-				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 0)
-						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
-			}
-		});
+		addState(new InterruptedCodonState(FORWARD_PREINTRON_TWO, true, true, 2, modelParameters));
 		addState(new IntronState(FORWARD_INTRON_2_1, true, modelParameters));
-		addState(new ConstantLengthState(FORWARD_POSTINTRON_ONE, 1) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// This is the final base of a codon -> use empirical 3rd-position probability
-				if (newEmission.length() != 1)
-					return Double.NEGATIVE_INFINITY;
-
-				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 2);
-			}
-		});
+		addState(new InterruptedCodonState(FORWARD_POSTINTRON_ONE, true, false, 1, modelParameters));
 
 		/** REVERSE STRAND */
 		addState(new StartRegionState(REVERSE_START, false, modelParameters));
@@ -115,54 +77,14 @@ public class LoxodesMagnusGHMM extends GHMM {
 		addState(new IntronState(REVERSE_INTRON_0_0, false, modelParameters));
 
 		/** intron preceded by one nt and followed by two nt of a codon */
-		addState(new ConstantLengthState(REVERSE_PREINTRON_ONE, 1) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// This is the last base of a codon
-				if (newEmission.length() != 1)
-					return Double.NEGATIVE_INFINITY;
-
-				return modelParameters.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 2);
-			}
-		});
+		addState(new InterruptedCodonState(REVERSE_PREINTRON_ONE, false, true, 1, modelParameters));
 		addState(new IntronState(REVERSE_INTRON_1_2, false, modelParameters));
-		addState(new ConstantLengthState(REVERSE_POSTINTRON_TWO, 2) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// These are the first and second of a codon
-				if (newEmission.length() != 2)
-					return Double.NEGATIVE_INFINITY;
-
-				newEmission = Utilities.reverseComplement(newEmission);
-				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 0)
-						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 1);
-			}
-		});
+		addState(new InterruptedCodonState(REVERSE_POSTINTRON_TWO, false, false, 2, modelParameters));
 
 		/** intron preceded by two nt and followed by one nt of a codon */
-		addState(new ConstantLengthState(REVERSE_PREINTRON_TWO, 2) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// These are the third and second of a codon
-				if (newEmission.length() != 2)
-					return Double.NEGATIVE_INFINITY;
-
-				newEmission = Utilities.reverseComplement(newEmission);
-				return modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(0), 1)
-						+ modelParameters.getLogBaseProbabilityCDS(newEmission.charAt(1), 2);
-			}
-		});
+		addState(new InterruptedCodonState(REVERSE_PREINTRON_TWO, false, true, 2, modelParameters));
 		addState(new IntronState(REVERSE_INTRON_2_1, false, modelParameters));
-		addState(new ConstantLengthState(REVERSE_POSTINTRON_ONE, 1) {
-			@Override
-			public double computeLogEmissionProbability(int previousState, String emissionHistory, String newEmission) {
-				// This is the first base of a codon
-				if (newEmission.length() != 1)
-					return Double.NEGATIVE_INFINITY;
-
-				return modelParameters.getLogBaseProbabilityCDS(Utilities.reverseComplement(newEmission).charAt(0), 0);
-			}
-		});
+		addState(new InterruptedCodonState(REVERSE_POSTINTRON_ONE, false, false, 1, modelParameters));
 
 		initialiseTransitionMatrix();
 		clearTransitionMatrix();
