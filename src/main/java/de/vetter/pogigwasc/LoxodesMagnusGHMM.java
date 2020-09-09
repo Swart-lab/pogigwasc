@@ -8,6 +8,16 @@ import de.vetter.pogigwasc.states.NoncodingState;
 import de.vetter.pogigwasc.states.StartRegionState;
 import de.vetter.pogigwasc.states.StopRegionState;
 
+/**
+ * Class for instantiating the particular GHMM used for predicting genes in
+ * <i>Loxodes magnus</i> (probably fit for other karyorelicts too). <br>
+ * Takes care of setting up the states and transitions, and provides a method
+ * {@link #parseToGFF(String, Parse, ModelParameters)} to convert a parse of
+ * this GHMM into gff-format
+ * 
+ * @author David Emanuel Vetter
+ *
+ */
 public class LoxodesMagnusGHMM extends GHMM {
 	/** State-names: Name states +... for forward strand, and -... for reverse strand */
 	public static final String NCS = "NCS";
@@ -34,11 +44,10 @@ public class LoxodesMagnusGHMM extends GHMM {
 	public static final String REVERSE_POSTINTRON_TWO = "-2 nts after intron";
 	
 	public LoxodesMagnusGHMM(final ModelParameters modelParameters) {
+		super();
 		/** 
 		 * Setting up the model 
 		 */
-
-		super();
 		addState(new NoncodingState(NCS, modelParameters));
 
 		/** FORWARD STRAND */

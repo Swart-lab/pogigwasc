@@ -98,8 +98,10 @@ public class App {
 		GHMM ghmm;
 		if(cmd.hasOption('n')) {
 			System.out.println("Running in intron-less mode");
+			ghmm = new LoxodesMagnusIntronless(modelParameters);
+		} else {
+			ghmm = new LoxodesMagnusGHMM(modelParameters);
 		}
-		ghmm = new LoxodesMagnusGHMM(modelParameters);
 
 		System.out.println(ghmm);
 
@@ -112,6 +114,11 @@ public class App {
 		writer.newLine();
 		writer.write("##Parameter file: " + parameterFile.getAbsolutePath());
 		writer.newLine();
+		
+		if(cmd.hasOption('n' )) {
+			writer.write("##INTRON-LESS prediction!");
+			writer.newLine();
+		}
 
 		/**
 		 * Now read in the fasta file sequence for sequence, and for each sequence
