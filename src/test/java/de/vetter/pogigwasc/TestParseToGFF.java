@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import static org.junit.Assert.*;
 
@@ -8,11 +8,6 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import de.vetter.pogigwasc.GHMM;
-import de.vetter.pogigwasc.LoxodesMagnusGHMM;
-import de.vetter.pogigwasc.ModelParameters;
-import de.vetter.pogigwasc.Parse;
 
 public class TestParseToGFF {
 

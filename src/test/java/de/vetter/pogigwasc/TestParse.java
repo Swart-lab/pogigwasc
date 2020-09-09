@@ -1,11 +1,9 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import de.vetter.pogigwasc.Pair;
-import de.vetter.pogigwasc.Parse;
 import de.vetter.pogigwasc.states.FixedSequenceState;
 import de.vetter.pogigwasc.states.HMMState;
 

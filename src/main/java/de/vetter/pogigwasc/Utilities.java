@@ -94,6 +94,31 @@ public class Utilities {
 	}
 
 	
+	public static double sumVector(double[] vector) {
+		double sum = 0.0;
+		for(double d : vector) {
+			if(d < 0 || d > 1)
+				throw new IllegalArgumentException("Probability vector contained a non-probability value " + d);
+			sum += d;
+		}
+		return sum;
+	}
+	
+	/**
+	 * Throws an Exception of the vector is not normalised (does not sum to 1) with
+	 * given tolerance (double-imprecision), and given error-message appended with
+	 * the actual sum
+	 * 
+	 * @param vector
+	 * @param tolerance
+	 * @param message
+	 */
+	public static void assertNormalisation(double[] vector, double tolerance, String message) {
+		if(Math.abs(sumVector(vector) - 1) > tolerance) {
+			throw new IllegalArgumentException(message + sumVector(vector));
+		}
+	}
+	
 	
 	/**
 	 * Precomputing the factorials

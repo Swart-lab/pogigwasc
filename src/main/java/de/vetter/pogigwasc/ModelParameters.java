@@ -178,11 +178,69 @@ public class ModelParameters {
 	}
 	
 	/**
-	 * Checks whether extracted probabilities are valid
+	 * Checks whether extracted probabilities are valid and consistent
 	 * @param properties
 	 */
 	private void checkProbabilities() {
-		// TODO: implement: Check that probabilities are valid
+		double tolerance = 1e-6;
+		
+		if(getProbabilityOfStayingInNCS() < 0 || getProbabilityOfStayingInNCS() >= 1) {
+			throw new IllegalArgumentException("transition_probability_of_staying_in_NCS has to be in [0,1), but was "
+					+ getProbabilityOfStayingInNCS());
+		}
+		
+		if(Math.abs(getProbabilityOfStayingInCDS() + getProbabilityGeneEnds() + 3*getProbabilityCDSToIntron() - 1.0) > tolerance) {
+			throw new IllegalArgumentException("transitions leaving CDS do not sum up to 1");
+		}
+		
+		if(!(intronMin <= intronMean && intronMean <= intronMax)) {
+			throw new IllegalArgumentException("intron min, mean and max length do not obey min <= mean <= max");
+		}
+		
+		Utilities.assertNormalisation(baseProbabilitiesNCS, tolerance, 
+				"The base-frequencies for NCS are not normalised, they sum up to ");
+		
+		Utilities.assertNormalisation(baseProbabilitiesIntron, tolerance,
+				"The base-frequencies for the middle-part of intron are not normalised, they sum up to ");
+		
+		Utilities.assertNormalisation(baseProbabilitiesStartregion, tolerance,
+				"The base-frequencies for the start region are not normalised, they sum up to ");
+
+		for (int row = 0; row < baseMarginalsCDS.length; row ++) {
+			Utilities.assertNormalisation(baseMarginalsCDS[row], tolerance, "The base-frequencies in row " + row
+					+ " of base_frequency_marginals_CDS do not sum up to 1, but to ");
+		}
+		
+		for (int row = 0; row < baseMarginalsStopregion.length; row++) {
+			Utilities.assertNormalisation(baseMarginalsStopregion[row], tolerance, "The base-frequencies in row " + row
+					+ " of base_frequency_marginals_stop_region do not sum up to 1, but to ");
+		}
+		
+		for (int row = 0; row < baseProbabilitiesSDS.length; row ++) {
+			Utilities.assertNormalisation(baseProbabilitiesSDS[row], tolerance, "The base-frequencies in row " + row
+					+ " of intron_base_frequencies_splice_donor_site do not sum up to 1, but to ");
+		}
+		
+		for (int row = 0; row < baseProbabilitiesSAS.length; row ++) {
+			Utilities.assertNormalisation(baseProbabilitiesSAS[row], tolerance, "The base-frequencies in row " + row
+					+ " of intron_base_frequencies_splice_acceptor_site do not sum up to 1, but to ");
+		}
+		
+		double correctedSum = 0d;
+		double basewiseSum = 0d;
+		for(String codon : stopRegionExplicitCodons.keySet()) {
+			correctedSum += stopRegionExplicitCodons.get(codon);
+			double codonProbability = 1d;
+			for (int i = 0; i < 3; i++) {
+				codonProbability *= baseMarginalsStopregion[i][Utilities.baseToIndex(codon.charAt(i))];
+			}
+			basewiseSum += codonProbability;
+		}
+		if(Math.abs(correctedSum - basewiseSum) > tolerance) {
+			throw new IllegalArgumentException(
+					"The probabilities listed in explicit_codon_probabilities_stop_region do not sum up to the same "
+							+ "value as under the base-wise model: " + correctedSum + " vs " + basewiseSum);
+		}
 	}
 	
 	

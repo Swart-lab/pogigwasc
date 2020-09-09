@@ -115,7 +115,7 @@ public class App {
 		writer.write("##Parameter file: " + parameterFile.getAbsolutePath());
 		writer.newLine();
 		
-		if(cmd.hasOption('n' )) {
+		if(cmd.hasOption('n')) {
 			writer.write("##INTRON-LESS prediction!");
 			writer.newLine();
 		}

@@ -1,10 +1,8 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import static org.junit.Assert.*;
 
 import org.junit.Test;
-
-import de.vetter.pogigwasc.Pair;
 
 public class TestPair {
 

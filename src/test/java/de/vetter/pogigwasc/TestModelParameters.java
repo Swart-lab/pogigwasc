@@ -1,4 +1,4 @@
-package de.vetter.masterthesis;
+package de.vetter.pogigwasc;
 
 import static org.junit.Assert.*;
 
@@ -9,8 +9,6 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import de.vetter.pogigwasc.ModelParameters;
 
 public class TestModelParameters {
 
@@ -176,13 +174,13 @@ public class TestModelParameters {
 		// check the four specified codons:
 		assertEquals(0, Math.exp(mp.getLogCodonProbabilityStopRegion("TGA")), TOLERANCE);
 		assertEquals(0.0018, Math.exp(mp.getLogCodonProbabilityStopRegion("TAA")), TOLERANCE);
-		assertEquals(0.047, Math.exp(mp.getLogCodonProbabilityStopRegion("AAG")), TOLERANCE);
-		assertEquals(0.060088, Math.exp(mp.getLogCodonProbabilityStopRegion("AAA")), TOLERANCE);
+		assertEquals(0.0472, Math.exp(mp.getLogCodonProbabilityStopRegion("AAG")), TOLERANCE);
+		assertEquals(0.063968, Math.exp(mp.getLogCodonProbabilityStopRegion("AAA")), TOLERANCE);
 		
 		// Check SOME other codons:
 		assertEquals(0.14*0.36*0.14, Math.exp(mp.getLogCodonProbabilityStopRegion("CAG")), TOLERANCE);
 		assertEquals(0.355*0.16*0.12, Math.exp(mp.getLogCodonProbabilityStopRegion("ACC")), TOLERANCE);
-		assertEquals(0.24*0.32*0.36, Math.exp(mp.getLogCodonProbabilityStopRegion("TTT")), TOLERANCE);
+		assertEquals(0.24*0.33*0.36, Math.exp(mp.getLogCodonProbabilityStopRegion("TTT")), TOLERANCE);
 		assertEquals(0.265*0.16*0.14, Math.exp(mp.getLogCodonProbabilityStopRegion("GCG")), TOLERANCE);
 	}
 	
