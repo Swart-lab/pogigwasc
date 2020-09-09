@@ -1,10 +1,10 @@
 ﻿# POGIGWASC
 A gene predictor developed on _Loxodes magnus_ in the summer-semester of 2020 as part of the master-thesis of David Emanuel Vetter (Thesis-title: "Prediction of genes in genomes with ambiguous genetic codes"). Heavily based on Augustus.
 
-Naming: POGIGWASC (IPA: [ˈpɔ.dʒɪdʒ.wəskʰ]) stands for "Prediciton of genes in genomes with ambiguous stop codons" -- the deviation from the thesis-name is due to the program only being specifically designed to handle an ambiguous UGA-codon. Its generaliseability to other cases of genetic code ambiguity is unknown.
+Naming: POGIGWASC (IPA: [ˈpɔ.dʒɪdʒ.wəskʰ]) stands for "Prediction of genes in genomes with ambiguous stop codons" -- the deviation from the thesis-name is due to the program only being specifically designed to handle an ambiguous UGA-codon. Its generalizeability to other cases of genetic code ambiguity is unknown.
 
 # Running the program:
-##Variant 1: Without eclipse -- just want to use the program
+## Variant 1: Without eclipse -- just want to use the program
 Prerequisites: **install Maven**
 
  1. download the code as a zip-file (from github) and extract the contents to some directory
@@ -14,7 +14,7 @@ Prerequisites: **install Maven**
 
 To move the compiled program, copy/move the **entire** `appassembler`-directory (which can be renamed) -- it does not suffice to copy/move just the generated `target/appassembler/bin/ghmm-predict` file
 
-##Variant 2: For working on the program
+## Variant 2: For working on the program
 Prerequisites: **install Eclipse**
 
  1. clone the git-repository with eclipse (or directly with git)
