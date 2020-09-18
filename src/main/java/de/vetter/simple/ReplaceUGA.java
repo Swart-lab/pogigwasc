@@ -312,7 +312,7 @@ public class ReplaceUGA {
 		ArrayList<Integer> occurrences = new ArrayList<Integer>();
 
 		// 15 seems to be underpowered
-		int upstream = 18; // 18;
+		int upstream = 24; // 18;
 		int downstream = 24;
 		boolean baseWise = false;
 
