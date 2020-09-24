@@ -182,12 +182,11 @@ public class LoxodesMagnusGHMM extends GHMM {
 					result.append(System.lineSeparator());
 
 				}
-
+				// Handling the start-region which extends beyond the CDS
 				if (currentFeature != GFFFeature.CDS)
 					startOfCurrentFeature = state.getName().equals(LoxodesMagnusGHMM.FORWARD_START)
 							? currentPos + (parameters.getStartRegionSize() - 3)
 							: currentPos;
-				// TODO ^ notice this! It is for the new StartRegion-state!
 				currentFeature = GFFFeature.CDS;
 
 				break;

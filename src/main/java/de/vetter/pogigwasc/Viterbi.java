@@ -3,12 +3,10 @@ package de.vetter.pogigwasc;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.vetter.pogigwasc.states.HMMState;
-
 /**
- * Implements the viterbi algorithm as described by Stanke (AUGUSTUS): Construct
+ * Implements the Viterbi algorithm as described by Stanke (AUGUSTUS): Construct
  * a Viterbi-instance for a GHMM and a given sequence, to compute the
- * viterbi-variables of that model on that sequence, and yield the MAP-parses
+ * Viterbi-variables of that model on that sequence, and yield the MAP-parses
  * 
  * @author David Emanuel Vetter
  *

@@ -9,7 +9,7 @@ package de.vetter.pogigwasc;
  */
 public class Utilities {
 
-	// Can be used for poisson -- but currently, i am no longer using poisson.
+	// Used for Poisson
 	private static final double[] LOG_FACTORIALS = new double[] { 0.0, 0.0, 0.6931471805599453, 1.791759469228055,
 			3.1780538303479453, 4.787491742782046, 6.579251212010101, 8.525161361065415, 10.60460290274525,
 			12.80182748008147, 15.104412573075518, 17.502307845873887, 19.98721449566189, 22.552163853123425,

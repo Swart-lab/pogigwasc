@@ -62,8 +62,6 @@ public class ModelParameters {
 
 			currentParameter = "start_region_size";
 			startregionSize = Integer.parseInt(properties.getProperty(currentParameter));
-			// old start-region (i.e. just deterministic ATG):
-			// startregionSize = 3;
 			
 			currentParameter = "stop_region_size";
 			stopregionSize = Integer.parseInt(properties.getProperty(currentParameter));
@@ -310,22 +308,6 @@ public class ModelParameters {
 		intronTruncatedPoissonNormaliser = 1-Math.exp(intronTruncatedPoissonNormaliser);
 		intronTruncatedPoissonNormaliser = intronTruncatedPoissonNormaliser/(intronMax - intronMin + 1);
 		// This value will be ADDED to the probability of seeing any length within min-max.
-		/*
-		System.out.println("Intron-state: length-distribution:");
-		System.out.println("l,poisson,empirical");
-
-		double[] LENGTH_PROBABILITIES = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-				0.0, 0.0, 0.0, 0.0, 0.2188, 0.2812, 0.1042, 0.2292, 0.1146, 0.0208, 0.0104,
-				0.0104, 0.0, 0.0, 0.0104, 0.0, 0.0, 0.0 };
-		
-		double sum = 0;
-		for(int k = 0; k < intronMax + 2; k++) {
-			sum += Math.exp(getLogProbabilityIntronLength(k));
-			System.out.println(k + "," + Math.exp(getLogProbabilityIntronLength(k)) + ","
-					+ (k < LENGTH_PROBABILITIES.length ? LENGTH_PROBABILITIES[k] : 0));
-		}
-		System.out.println("\n sum = " + sum + " (should be 1)");
-		*/
 	}
 	
 	/**

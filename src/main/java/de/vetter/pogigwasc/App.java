@@ -19,18 +19,19 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
- * Main class for gene-prediction: Takes at least one, and up to three
+ * Main class for gene-prediction: Takes at least one, and up to four
  * parameters:
  * <ol>
  * <li>-i: the input-file (.fasta)</li>
  * <li>-o: the output file (.gff, can have arbitrary extension)</li>
  * <li>-p: the parameter-file (.properties), flagged by "-p"</li>
+ * <li>-n: flag whether the prediction should be intronless (this does
+ * <b>not</b> quite mean prediction optimized for mRNA-reads, as multiple genes
+ * can still be predicted on the same contig!)
  * </ol>
  * 
  * If no output file is specified, one will be created in the same directory as
  * the input-file, with date and time-information in its filename.<br>
- * If no parameter-file is specified, a default parameter-file (also, and mainly
- * used for code-testing) will be used (<b>this no longer works, if the executable is removed from the sources!</b>)
  */
 public class App {
 

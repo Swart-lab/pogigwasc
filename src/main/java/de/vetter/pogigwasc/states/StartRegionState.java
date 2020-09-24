@@ -26,7 +26,6 @@ public class StartRegionState extends HMMStateWithStrandAndParameters {
 		}
 		
 		double result = 0;
-		/* */
 		for(int i = 0; i < parameters.getStartRegionSize() - 3; i++) {
 			result += parameters.getLogBaseProbabilityStartRegion(newEmission.charAt(i));
 		}
