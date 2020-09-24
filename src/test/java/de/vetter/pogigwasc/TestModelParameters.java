@@ -19,14 +19,14 @@ public class TestModelParameters {
 	@Before
 	public void setup() throws IOException {
 		FileReader reader = new FileReader(
-				new File("resources//de//vetter//masterthesis//parameter//parameters-examplefile.properties"));
+				new File("resources//de//vetter//pogigwasc//parameter//parameters-examplefile.properties"));
 		mp = new ModelParameters(reader);
 	}
 	
 	@Test
 	public void testInvalidParameterFile() throws FileNotFoundException {
 		FileReader reader = new FileReader(
-				new File("resources//de//vetter//masterthesis//parameter//parameters-invalid.properties"));
+				new File("resources//de//vetter//pogigwasc//parameter//parameters-invalid.properties"));
 		
 		try {
 			mp = new ModelParameters(reader);
@@ -38,7 +38,7 @@ public class TestModelParameters {
 	@Test
 	public void testInvalidCodonCorrection() throws FileNotFoundException {
 		FileReader reader = new FileReader(
-				new File("resources//de//vetter//masterthesis//parameter//parameters-invalid-codon-correction.properties"));
+				new File("resources//de//vetter//pogigwasc//parameter//parameters-invalid-codon-correction.properties"));
 		
 		try {
 			mp = new ModelParameters(reader);

@@ -17,7 +17,7 @@ public class TestParseToGFF {
 	@Before
 	public void setup() throws IOException {
 		FileReader reader = new FileReader(
-				new File("resources//de//vetter//masterthesis//parameter//parameters-examplefile.properties"));
+				new File("resources//de//vetter//pogigwasc//parameter//parameters-examplefile.properties"));
 		mp = new ModelParameters(reader);
 		ghmm = new LoxodesMagnusGHMM(mp);
 	}
