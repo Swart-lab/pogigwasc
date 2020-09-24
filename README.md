@@ -23,11 +23,6 @@ Prerequisites: **install Eclipse**
  3. Rightclick `de.vetter.pogigwasc/App.java` and run as java application. This should give the usual help-text (set command-line args via Run>Run Configurations)
  
 # Program structure overview:
-This project contains 2 separate parts:
- 1. The GHMM/Gene-prediction in `src/main/java/de/vetter/pogigwasc`
- 2. simplistic UGA-cleaning in `src/main/java/de/vetter/simple`
- 
-The second one is more a programming sketch, the first will be explained in slightly more detail:
 
 Directly in `src/main/java/de/vetter/pogigwasc`, most relevant classes for gene-prediction are found, in particular, the main-class `App` with the `main`-method that defines what happens, when the program is run (cf. pom.xml). 
  - `ModelParameters` is used to load and query the model-parameters from an external file
